@@ -1,0 +1,9 @@
+[submodule "atlas"]
+	path = atlas
+	url = oak-git:~/projects/atlas-com
+[submodule "commandline"]
+	path = commandline
+	url = oak-git:~/projects/commandline
+[submodule "hades"]
+	path = hades
+	url = oak-git:~/projects/hades

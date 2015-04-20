@@ -1,0 +1,238 @@
+@font-face {
+    font-family: 'ShareTechMono';
+    src: url('/ShareTechMono-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'ShareTech';
+    src: url('/ShareTech-Regular.ttf');
+}
+
+body {
+    background-color: #ddd;
+    font-family: 'ShareTech', 'Monospace';
+    margin: 0;
+    padding: 0;
+}
+
+/*
+ * Simple grid system.
+ */
+
+*, *:after, *:before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.grid {
+    width: auto;
+}
+
+[class*='col-'] {
+    float: left;
+    padding-right: 20px;
+}
+
+[class*='col-']:last-of-type {
+    padding-right: 0;
+}
+
+.col-1-2 {
+    width: 50%;
+}
+
+.col-2-2 {
+    width: 100%;
+}
+
+.col-1-3 {
+    width: 33.3%;
+}
+
+.col-2-3 {
+    width: 66.6%;
+}
+
+.col-3-3 {
+    width: 100%;
+}
+
+.grid:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.navigation {
+    background-color: white;
+    border-bottom: 1px solid black;
+    margin: 0;
+    padding: 0.5em;
+    list-style-type: none;
+    font-size: large;
+}
+
+.content {
+    background-color: white;
+    border: 1px solid black;
+    margin: 1em;
+    padding: 1em;
+}
+
+/*
+ * A list with clickable items.
+ */
+
+.action-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.action-list-large {
+    -moz-column-count: 3;
+    column-count: 3;
+}
+
+.action-list li {
+    border-bottom: 1px dashed silver;
+    padding: 0.6em;
+}
+
+.action-list li:hover {
+    background-color: lightgrey;
+}
+
+.vertical-align-helper {
+    display: inline-block;
+    height: 100%;
+    width: 0;
+    margin: 0;
+    vertical-align: middle;
+}
+
+#template_content {
+    background-color: white;
+    color: black;
+}
+
+/*
+ * All anchors should be displayed as links, even if they don't have a href
+ * attribute.
+ */
+
+a {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/*
+ * Message box styles.
+ */
+
+.messagebox {
+    border-bottom: 4px solid black;
+    padding: 1em;
+    transition: all 1s;
+}
+.messagebox-close {
+    float: right;
+}
+.messagebox-error {
+    background-color: #ffbaba;
+}
+.messagebox-information {
+    background-color: #bde5f8;
+}
+.messagebox-warning {
+    background-color: #feefb3;
+}
+.messagebox-success {
+    background-color: #dff2bf;
+}
+
+/*
+ * Modal dialogs hide all content on the screen.
+ */
+
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1040;
+    background-color: rgba(127, 127, 127, 0.5);
+}
+
+.modal-dialog {
+    overflow: auto;
+    position: fixed;
+    top: 10%;
+    height: 70%;
+    /*left: 50%;*/
+    left: 20%;
+    right: 20%;
+    width: auto;
+    z-index: 1050;
+    /*width: 560px;*/
+    /*margin-left: -280px;*/
+    background-color: #eee;
+    border: 1px solid black;
+    border-bottom: none;
+    padding: 1em;
+    /*border-radius: 6px;*/
+    outline: none;
+    /*box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);*/
+    background-clip: padding-box;
+}
+
+.modal-button-box {
+    text-align: right;
+    position: fixed;
+    top: 80%;
+    left: 20%;
+    right: 20%;
+    width: auto;
+    z-index: 1050;
+    /*width: 560px;*/
+    /*margin-left: -280px;*/
+    background-color: #eee;
+    border: 1px solid black;
+    border-top: none;
+    padding: 1em;
+}
+
+div.aligned div.group {
+    padding: 0.5em;
+}
+
+div.aligned div.group label {
+    text-align: right;
+    display: inline-block;
+    width: 10em;
+    padding-right: 0.5em;
+}
+
+div.aligned div.group input, div.aligned div.group textarea {
+    display: inline-block;
+}
+
+button, input, select, textarea {
+    background-color: white;
+    border: 1px solid black;
+    padding: 0.5em;
+}
+
+button {
+    border-radius: 5px;
+}
+
+.button-box {
+    text-align: right;
+}
+
+span.disabled {
+    color: lightgrey;
+}
+

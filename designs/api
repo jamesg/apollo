@@ -1,0 +1,26 @@
+Type
+====
+
+* /type [GET, POST] - collection of types
+* /type/<type_id/type_name> [DELETE, GET, PUT] - detailed type information
+* /type/<type_id/type_name>/item [GET] - collection of items with given type
+
+Items
+=====
+
+* /item [GET, POST] - collection of items
+* /item/<item_id> [DELETE, GET, PUT] - detailed item information
+* /item/<item_id>/image [DELETE, GET, POST] - item image.
+
+Makers
+======
+
+* /maker [GET, POST] - collection of makers
+* /maker/<maker_id> [DELETE, GET, PUT] - detailed maker information
+* /maker/<maker_id>/item [GET] - collection of items made by maker
+
+Browse by Year
+==============
+
+* /year/<year>/item [GET] - collection of items
+

@@ -1,0 +1,102 @@
+<html>
+<meta charset="UTF-8">
+
+<head>
+
+<title>Computer Collection - Management</title>
+<link href="style.css" rel="stylesheet" type="text/css" media="all"></link>
+<link
+    href="open-iconic/font/css/open-iconic.css"
+    rel="stylesheet"
+    type="text/css"
+    media="all">
+</link>
+
+</head>
+
+<body>
+
+<div id="modal-container" class="modal-container"></div>
+<ul id="navigation" class="navigation"></ul>
+<div id="template-content" class="content"></div>
+
+<script type="text/template" id="modal-template">
+<div class="modal">
+    <div class="modal-dialog">
+        <form>
+            <div class="modal-content" name="modal-content">
+            </div>
+        </form>
+    </div>
+    <div class="modal-button-box">
+        <% if(_(buttons).has(['close'])) print('<button type="button" name="close">Close</button>'); %>
+        <% if(_(buttons).has(['cancel'])) print('<button type="button" name="cancel">Cancel</button>'); %>
+        <% if(_(buttons).has(['no'])) print('<button type="button" name="no">No</button>'); %>
+
+        <% if(_(buttons).has(['destroy'])) print('<button class="button-warning" type="button" name="delete">Delete</button>'); %>
+
+        <% if(_(buttons).has(['save'])) print('<button class="button-primary" type="button" name="save">Save</button>'); %>
+        <% if(_(buttons).has(['create'])) print('<button type="button" name="create">Create</button>'); %>
+        <% if(_(buttons).has(['yes'])) print('<button type="button" name="yes">Yes</button>'); %>
+    </div>
+</div>
+</script>
+
+<script type="text/template" id="manage-homepage">
+<div name="modal-container"></div>
+<h1>Management</h1>
+
+<div class="grid">
+    <div class="col-1-2">
+        <h2>Makers</h2>
+        <button name="new-maker">New</button>
+        <ul class="action-list" name="makers"></ul>
+    </div>
+    <div class="col-1-2">
+        <h2>Types</h2>
+        <button name="new-type">New</button>
+        <ul class="action-list" name="types"></ul>
+    </div>
+</div>
+
+</div>
+</script>
+
+<script type="text/template" id="maker-form-template">
+<div name="messagebox"></div>
+<h3>
+<% if(isNew) print('New Maker'); else print('Edit Maker'); %>
+</h3>
+<div>
+    <label for="maker_name">Name</label>
+    <input type="text" name="maker_name" value="<%- maker_name %>"></input>
+</div>
+</script>
+
+<script type="text/template" id="type-form-template">
+<div name="messagebox"></div>
+<h3>
+<% if(isNew) print('New Type'); else print('Edit Type'); %>
+</h3>
+<div>
+    <label for="type_name">Name</label>
+    <input type="text" name="type_name" value="<%- type_name %>"></input>
+</div>
+</script>
+
+<script type="text/javascript" src="underscore.js"></script>
+<script type="text/javascript" src="backbone.js"></script>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="models.js"></script>
+<script type="text/javascript" src="stacked_application.js"></script>
+<script type="text/javascript" src="application.js"></script>
+<script type="text/javascript" src="manage.js"></script>
+<script type="text/javascript">
+Backbone.$ = $;
+var gApplication = new StackedApplication(ManageHomePage);
+</script>
+
+</body>
+
+</html>
+
