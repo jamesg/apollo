@@ -45,11 +45,11 @@
 <div class="grid">
     <div class="col-1-3">
         <h2>Top Five Makers</h2>
-        <ul class="action-list" id="top-makers"></ul>
+        <ul class="text-list action-list" id="top-makers"></ul>
     </div>
     <div class="col-1-3">
         <h2>Top Five Types</h2>
-        <ul class="action-list" id="top-types"></ul>
+        <ul class="text-list action-list" id="top-types"></ul>
     </div>
     <div class="col-1-3">
         <h2>Tools</h2>
@@ -61,7 +61,7 @@
 <script type="text/template" id="makerpage-template">
 <div name="details"></div>
 <div class="button-box"><button name="new-item">New <%-maker_name%> Item</button></div>
-<ul name="items" class="action-list"></ul>
+<ul name="items" class="text-list action-list"></ul>
 </script>
 
 <script type="text/template" id="makerdetails-template">
@@ -140,7 +140,7 @@
 
 <h2>Images</h2>
 <div class="button-box"><button name="addimage">Add Image</button></div>
-<ul class="image-list" name="images"></ul>
+<ul class="action-list image-list" name="images"></ul>
 
 <h2>General Information</h2>
 <emph>Year of Release</emph> <%-item_year%>
@@ -172,6 +172,10 @@
 <% } else { %>
 <emph>No notes</emph>
 <% } %>
+</script>
+
+<script type="text/template" id="itemimagemodal-template">
+<img src="<%-url%>" alt="<%-alt%>">
 </script>
 
 <script type="text/javascript" src="underscore.js"></script>

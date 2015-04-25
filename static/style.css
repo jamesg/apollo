@@ -95,12 +95,16 @@ body {
 }
 
 .action-list li {
-    border-bottom: 1px dashed silver;
     padding: 0.6em;
+    cursor: pointer;
 }
 
 .action-list li:hover {
     background-color: lightgrey;
+}
+
+.text-list li {
+    border-bottom: 1px dashed silver;
 }
 
 .vertical-align-helper {
@@ -234,5 +238,12 @@ button {
 
 span.disabled {
     color: lightgrey;
+}
+
+.image-list {
+    list-style-type: none;
+}
+
+.image-list li {
 }
 

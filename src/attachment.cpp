@@ -102,7 +102,6 @@ apollo::attachment apollo::get_attachment(
 {
     attachment out;
     out.info = hades::get_by_id<attachment_info>(conn, id);
-    atlas::log::test("apollo::get_attachment") << styx::serialise_json(out.info);
 
     sqlite3_stmt *stmt;
     sqlite3_prepare(
@@ -140,8 +139,7 @@ void apollo::insert_attachment(attachment& a, hades::connection& conn)
     hades::bind(4, &(a.data[0]), a.data.size(), stmt);
     hades::step(stmt);
     sqlite3_finalize(stmt);
-    a.info.set_id(// = hades::get_by_id<attachment_info>(
-        //conn,
+    a.info.set_id(
         attachment_info::id_type{hades::detail::last_insert_rowid(conn)}
         );
 }

@@ -10,7 +10,7 @@ Items
 
 * /item [GET, POST] - collection of items
 * /item/<item_id> [DELETE, GET, PUT] - detailed item information
-* /item/<item_id>/image [DELETE, GET, POST] - item image.
+* /item/<item_id>/image [GET, POST] - item image collection.
 
 Makers
 ======
@@ -23,4 +23,11 @@ Browse by Year
 ==============
 
 * /year/<year>/item [GET] - collection of items
+
+Attachments
+===========
+
+* /attachment/<attachment_id>
+* /attachment/<attachment_id>/image/<width>x<height>
+* /attachment/<attachment_id>/info
 

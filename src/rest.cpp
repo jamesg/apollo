@@ -299,5 +299,18 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
+
+    // Attachments.
+    server.router().install<int>(
+        atlas::http::matcher("/attachment/([0-9]+)/info", "GET"),
+        [&conn](const int attachment_id) {
+            return atlas::http::response(
+                hades::get_by_id<attachment_info>(
+                    conn,
+                    attachment_info::id_type{attachment_id}
+                    );
+                );
+        }
+        );
 }
 

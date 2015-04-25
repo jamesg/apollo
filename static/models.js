@@ -74,6 +74,32 @@ var Item = RestModel.extend(
     }
     );
 
+var ItemImage = RestModel.extend(
+    {
+        idAttribute: 'attachment_id',
+        urlFullsize: function() {
+            return '/attachment/' + this.get('attachment_id') + '/image'
+        },
+        urlThumb: function() {
+            return '/attachment/' + this.get('attachment_id') + '/image/150x150'
+        },
+        urlMedium: function() {
+            return '/attachment/' + this.get('attachment_id') + '/image/400x300'
+        }
+    }
+    );
+
+var ItemImageCollection = RestCollection.extend(
+    {
+        initialize: function(options) {
+            RestCollection.prototype.initialize.apply(this, arguments);
+            this.item = options.item;
+        },
+        model: ItemImage,
+        url: function() { return '/item/' + this.item.get('item_id') + '/image'; }
+    }
+    );
+
 var ItemCollection = RestCollection.extend(
     {
         model: Item,

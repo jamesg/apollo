@@ -171,6 +171,39 @@ var ItemPage = PageView.extend(
             this.model.fetch();
 
             this.$el.html(this.template(this.templateParams()));
+
+            var imageCollection = new ItemImageCollection({ item: this.model });
+            imageCollection.fetch();
+            var imageCollectionView = new CollectionView({
+                model: imageCollection,
+                el: this.$('ul[name=images]'),
+                view: StaticView.extend({
+                    tagName: 'li',
+                    template: '<img src="<%-url%>" alt="<%-alt%>">',
+                    templateParams: function() {
+                        return {
+                            url: this.model.urlThumb(),
+                            alt: this.model.get('attachment_title')
+                        };
+                    },
+                    events: { click: 'showDialog' },
+                    showDialog: function() {
+                        var m = new Modal({
+                            model: this.model,
+                            view: StaticView.extend({
+                                template: $('#itemimagemodal-template').html(),
+                                templateParams: function() {
+                                    return {
+                                        url: this.model.urlMedium(),
+                                        alt: this.model.get('attachment_title')
+                                    };
+                                }
+                            })
+                        });
+                        gApplication.modal(m);
+                    }
+                })
+            })
         },
         template: _.template($('#itempage-template').html()),
         events: {
