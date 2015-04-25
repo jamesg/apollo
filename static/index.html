@@ -102,12 +102,12 @@
 
     <div class="group">
     <label for="item_cond">Rating</label>
-    <select name="item_cond" value="<%-item_cond%>">
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
+    <select name="item_cond">
+        <option value="1"<% if(item_cond==1) { print(' selected'); } %>>1</option>
+        <option value="2"<% if(item_cond==2) { print(' selected'); } %>>2</option>
+        <option value="3"<% if(item_cond==3) { print(' selected'); } %>>3</option>
+        <option value="4"<% if(item_cond==4) { print(' selected'); } %>>4</option>
+        <option value="5"<% if(item_cond==5) { print(' selected'); } %>>5</option>
     </select>
     </div>
 
@@ -174,7 +174,7 @@
 <% } %>
 </script>
 
-<script type="text/template" id="itemimagemodal-template">
+<script type="text/template" id="itemimageform-template">
 <img src="<%-url%>" alt="<%-alt%>">
 </script>
 

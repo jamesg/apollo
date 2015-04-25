@@ -172,10 +172,10 @@ var ItemPage = PageView.extend(
 
             this.$el.html(this.template(this.templateParams()));
 
-            var imageCollection = new ItemImageCollection({ item: this.model });
-            imageCollection.fetch();
+            this._imageCollection = new ItemImageCollection({ item: this.model });
+            this._imageCollection.fetch();
             var imageCollectionView = new CollectionView({
-                model: imageCollection,
+                model: this._imageCollection,
                 el: this.$('ul[name=images]'),
                 view: StaticView.extend({
                     tagName: 'li',
@@ -191,7 +191,7 @@ var ItemPage = PageView.extend(
                         var m = new Modal({
                             model: this.model,
                             view: StaticView.extend({
-                                template: $('#itemimagemodal-template').html(),
+                                template: $('#itemimageform-template').html(),
                                 templateParams: function() {
                                     return {
                                         url: this.model.urlMedium(),
@@ -200,6 +200,13 @@ var ItemPage = PageView.extend(
                                 }
                             })
                         });
+                        this.listenTo(
+                            m,
+                            'finished',
+                            (function() {
+                                this._imageCollection.fetch();
+                            }).bind(this)
+                            );
                         gApplication.modal(m);
                     }
                 })
@@ -233,7 +240,7 @@ var ItemPage = PageView.extend(
             this.listenTo(
                 m,
                 'finished',
-                (function() { this.model.fetch(); this.render(); }).bind(this)
+                (function() { this._imageCollection.fetch(); }).bind(this)
                 );
         }
     }
