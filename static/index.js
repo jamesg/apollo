@@ -125,6 +125,7 @@ var ImageUploadForm = StaticView.extend(
     {
         initialize: function(options) {
             StaticView.prototype.initialize.apply(this, arguments);
+            this._uploadUrl = options.url;
             this.on('save', this.save.bind(this));
             this.render();
         },
@@ -135,18 +136,21 @@ var ImageUploadForm = StaticView.extend(
                 new MessageBox({ el: this.$('div[name=messagebox]') });
         },
         save: function() {
-            var messageBox = this._messageBox;
+            var modal = this;
             var reqListener = function() {
                 //el.disabled = false;
                 if(this.response['error'])
-                    messageBox.displayError('Upload failed: ' + this.response.error);
+                    modal._messageBox.displayError(
+                        'Upload failed: ' + this.response.error
+                        );
                 else
-                    messageBox.displaySuccess('Upload complete');
+                    modal.trigger('finished');
+                    //messageBox.displaySuccess('Upload complete');
             };
             var xhr = new XMLHttpRequest();
             xhr.open(
                     'post',
-                    '/attachment',
+                    '/item/' + this.model.get('item_id') + '/image',
                     true
                     );
             xhr.onload = reqListener;
@@ -189,6 +193,7 @@ var ItemPage = PageView.extend(
         addImage: function() {
             var m = new Modal({
                 buttons: { cancel: true, save: true },
+                model: this.model,
                 view: ImageUploadForm
             });
             gApplication.modal(m);

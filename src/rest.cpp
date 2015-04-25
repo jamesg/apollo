@@ -188,6 +188,23 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         }
         );
 
+    // Item images.
+    server.router().install<int>(
+        atlas::http::matcher("/item/([0-9]+)/image", "GET"),
+        [&conn](const int item_id) {
+            return atlas::http::json_response(
+                hades::join<attachment_info, image_of>(
+                    conn,
+                    hades::where(
+                        "attachment.attachment_id = image_of.attachment_id AND "
+                        "image_of.item_id = ? ",
+                        hades::row<int>(item_id)
+                        )
+                    )
+                );
+        }
+        );
+
     // Maker collection.
     server.router().install<>(
         atlas::http::matcher("/maker", "GET"),

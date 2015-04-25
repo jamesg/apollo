@@ -24,7 +24,6 @@ namespace apollo
         extern const char attachment_orig_filename[];
         extern const char attachment_title[];
         extern const char attachment_upload_date[];
-        extern const char attachment_data[];
     }
     namespace relvar
     {
@@ -94,23 +93,22 @@ namespace apollo
         }
     };
 
-    class attachment :
+    class attachment_info :
         public hades::tuple<
             attr::attachment_id,
             attr::attachment_orig_filename,
             attr::attachment_title,
-            attr::attachment_upload_date,
-            attr::attachment_data>,
+            attr::attachment_upload_date>,
         public hades::has_candidate_key<attr::attachment_id>,
         public hades::relation<relvar::attachment>,
-        public hades::crud<attachment>
+        public hades::crud<attachment_info>
     {
     public:
-        attachment()
+        attachment_info()
         {
         }
 
-        attachment(const styx::element& e) :
+        attachment_info(const styx::element& e) :
             styx::object(e)
         {
         }

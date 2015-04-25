@@ -16,7 +16,6 @@ const char apollo::attr::attachment_id[] = "attachment_id";
 const char apollo::attr::attachment_orig_filename[] = "attachment_orig_filename";
 const char apollo::attr::attachment_title[] = "attachment_title";
 const char apollo::attr::attachment_upload_date[] = "attachment_upload_date";
-const char apollo::attr::attachment_data[] = "attachment_data";
 const char apollo::relvar::type[] = "type";
 const char apollo::relvar::item[] = "item";
 const char apollo::relvar::maker[] = "maker";
@@ -59,6 +58,13 @@ void apollo::db::create(hades::connection& conn)
         " attachment_title VARCHAR, "
         " attachment_upload_date VARCHAR, "
         " attachment_data BLOB "
+        " ) ",
+        conn
+        );
+    hades::devoid(
+        "CREATE TABLE IF NOT EXISTS image_of ( "
+        " attachment_id INTEGER REFERENCES attachment(attachment_id), "
+        " item_id INTEGER REFERENCES item(item_id) "
         " ) ",
         conn
         );

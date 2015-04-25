@@ -7,6 +7,7 @@
 #include "hades/crud.ipp"
 #include "hades/get_by_id.hpp"
 
+#include "attachment.hpp"
 #include "db.hpp"
 
 void apollo::image_scaled(
@@ -20,22 +21,19 @@ void apollo::image_scaled(
         atlas::http::uri_callback_type callback_failure
         )
 {
-    attachment a =
-        hades::get_by_id<attachment>(conn, attachment::id_type{attachment_id});
-
-    const std::string filename(a.get_string<attr::attachment_orig_filename>());
-    const std::string extension(filename.substr(filename.find_last_of(".") + 1));
-    const std::string mimetype(mimetypes.content_type(extension));
-
-    Magick::Blob blob;
     try
     {
+        attachment a = get_attachment(conn, attachment_info::id_type{attachment_id});
+
+        const std::string filename(a.info.get_string<attr::attachment_orig_filename>());
+        const std::string extension(filename.substr(filename.find_last_of(".") + 1));
+        const std::string mimetype(mimetypes.content_type(extension));
+
+        Magick::Blob blob;
         Magick::Image image(
             Magick::Blob(
-                reinterpret_cast<const void*>(
-                    &(a.get_string<attr::attachment_data>().c_str()[0])
-                    ),
-                a.get_string<attr::attachment_data>().size()
+                reinterpret_cast<const void*>(&(a.data[0])),
+                a.data.size()
                 )
             );
         short orientation = 1;
@@ -44,9 +42,9 @@ void apollo::image_scaled(
             // Retrieve orientation
             auto exiv_image = Exiv2::ImageFactory::open(
                 reinterpret_cast<const unsigned char*>(
-                    &(a.get_string<attr::attachment_data>().c_str()[0])
+                    &(a.data[0])
                     ),
-                a.get_string<attr::attachment_data>().size()
+                a.data.size()
                 );
             exiv_image->readMetadata();
 

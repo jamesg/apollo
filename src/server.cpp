@@ -13,6 +13,7 @@
 #include "attachment.hpp"
 #include "db.hpp"
 #include "image_scaled.hpp"
+#include "item_image.hpp"
 #include "rest.hpp"
 
 apollo::server::server(
@@ -77,14 +78,52 @@ apollo::server::server(
 
     rest::install(*m_connection, m_http_server);
     m_http_server.router().install(
-        atlas::http::matcher("/attachment", "POST"),
-        boost::bind(
-            &upload_file,
-            boost::ref(*m_connection),
-            _1,
-            _3,
-            _4
+        atlas::http::matcher("/item/([0-9]+)/image", "POST"),
+        [this](
+            mg_connection *mg_conn,
+            boost::smatch args,
+            atlas::http::uri_callback_type success,
+            atlas::http::uri_callback_type failure
             )
+        {
+            const int item_id = boost::lexical_cast<int>(args[1]);
+            upload_item_image(
+                *m_connection,
+                mg_conn,
+                item_id,
+                success,
+                failure
+                );
+        }
+        );
+    m_http_server.router().install(
+        atlas::http::matcher("/attachment", "POST"),
+        [this](
+            mg_connection *mg_conn,
+            boost::smatch args,
+            atlas::http::uri_callback_type success,
+            atlas::http::uri_callback_type failure
+            )
+        {
+            upload_file(
+                *m_connection,
+                mg_conn,
+                "attachment_title",
+                "attachment_data",
+                [this, mg_conn, success](attachment a) {
+                    insert_attachment(a, *m_connection);
+
+                    mg_send_status(mg_conn, 200);
+                    mg_send_header(mg_conn, "Content-type", "text/json");
+
+                    auto r = atlas::http::json_response(a.info);
+                    mg_send_data(mg_conn, r.data.c_str(), r.data.length());
+
+                    success();
+                },
+                failure
+                );
+        }
         );
     m_http_server.router().install(
         atlas::http::matcher("/attachment/([0-9]+)", "GET"),
