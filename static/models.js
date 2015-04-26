@@ -74,9 +74,20 @@ var Item = RestModel.extend(
     }
     );
 
-var ItemImage = RestModel.extend(
+var Attachment = RestModel.extend(
     {
         idAttribute: 'attachment_id',
+        defaults: {
+            attachment_title: '',
+            attachment_orig_filename: '',
+            attachment_upload_data: ''
+        },
+        url: function() {
+            if(this.isNew())
+                return '/attachment';
+            else
+                return '/attachment/' + this.get('attachment_id') + '/info';
+        },
         urlFullsize: function() {
             return '/attachment/' + this.get('attachment_id') + '/image'
         },
@@ -91,11 +102,11 @@ var ItemImage = RestModel.extend(
 
 var ItemImageCollection = RestCollection.extend(
     {
-        initialize: function(options) {
+        initialize: function(models, options) {
             RestCollection.prototype.initialize.apply(this, arguments);
             this.item = options.item;
         },
-        model: ItemImage,
+        model: Attachment,
         url: function() { return '/item/' + this.item.get('item_id') + '/image'; }
     }
     );

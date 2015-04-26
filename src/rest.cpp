@@ -312,5 +312,29 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
+    server.router().install_json<int>(
+        atlas::http::matcher("/attachment/([0-9]+)/info", "PUT"),
+        [&conn](styx::element a_e, const int attachment_id) {
+            attachment_info a(a_e);
+            a.update(conn);
+            return atlas::http::json_response(
+                hades::get_by_id<attachment_info>(
+                    conn,
+                    attachment_info::id_type{attachment_id}
+                    )
+                );
+        }
+        );
+    server.router().install<int>(
+        atlas::http::matcher("/attachment/([0-9]+)/info", "DELETE"),
+        [&conn](const int attachment_id) {
+            attachment_info a;
+            a.set_id(attachment_info::id_type{attachment_id});
+            if(a.destroy(conn))
+                return atlas::http::json_response(a);
+            else
+                return atlas::http::json_error_response("deleting attachment");
+        }
+        );
 }
 

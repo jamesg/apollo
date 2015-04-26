@@ -172,7 +172,7 @@ var ItemPage = PageView.extend(
 
             this.$el.html(this.template(this.templateParams()));
 
-            this._imageCollection = new ItemImageCollection({ item: this.model });
+            this._imageCollection = new ItemImageCollection([], { item: this.model });
             this._imageCollection.fetch();
             var imageCollectionView = new CollectionView({
                 model: this._imageCollection,
@@ -188,25 +188,37 @@ var ItemPage = PageView.extend(
                     },
                     events: { click: 'showDialog' },
                     showDialog: function() {
+                        // Show the dialog for an image connected to an item.
+                        //this.model.fetch();
+                        var attachment = this.model;
                         var m = new Modal({
+                            buttons: { close: true, destroy: true },
                             model: this.model,
                             view: StaticView.extend({
+                                initialize: function() {
+                                    StaticView.prototype.initialize.apply(this, arguments);
+                                    this.on('destroy', this.showDestroyDialog.bind(this));
+                                },
                                 template: $('#itemimageform-template').html(),
                                 templateParams: function() {
-                                    return {
+                                    return _(_.clone(this.model.attributes)).extend({
                                         url: this.model.urlMedium(),
                                         alt: this.model.get('attachment_title')
-                                    };
+                                    });
+                                },
+                                showDestroyDialog: function() {
+                                    gApplication.modal(
+                                        new ConfirmModal({
+                                            message: 'Are you sure you want to delete this image?',
+                                            callback: (function() {
+                                                this.model.destroy();
+                                                this.trigger('finished');
+                                            }).bind(this)
+                                        })
+                                        );
                                 }
                             })
                         });
-                        this.listenTo(
-                            m,
-                            'finished',
-                            (function() {
-                                this._imageCollection.fetch();
-                            }).bind(this)
-                            );
                         gApplication.modal(m);
                     }
                 })

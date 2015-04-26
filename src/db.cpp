@@ -63,8 +63,10 @@ void apollo::db::create(hades::connection& conn)
         );
     hades::devoid(
         "CREATE TABLE IF NOT EXISTS image_of ( "
-        " attachment_id INTEGER REFERENCES attachment(attachment_id), "
+        " attachment_id INTEGER REFERENCES attachment(attachment_id) "
+        "  ON DELETE CASCADE, "
         " item_id INTEGER REFERENCES item(item_id) "
+        "  ON DELETE CASCADE "
         " ) ",
         conn
         );
