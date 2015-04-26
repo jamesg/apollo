@@ -10,7 +10,7 @@ Items
 
 * /item [GET, POST] - collection of items
 * /item/<item_id> [DELETE, GET, PUT] - detailed item information
-* /item/<item_id>/image [GET, POST] - item image collection.
+* /item/<item_id>/image [GET, POST] - item image collection.  POST expects a HTML form
 
 Makers
 ======
@@ -27,7 +27,7 @@ Browse by Year
 Attachments
 ===========
 
-* /attachment/<attachment_id>
-* /attachment/<attachment_id>/image/<width>x<height>
-* /attachment/<attachment_id>/info
+* /attachment/<attachment_id> [GET] - download the attachment file
+* /attachment/<attachment_id>/image/<width>x<height> [GET] - download a scaled image
+* /attachment/<attachment_id>/info [DELETE, GET, PUT] - attachment metadata
 
