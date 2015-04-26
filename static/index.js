@@ -163,6 +163,47 @@ var ImageUploadForm = StaticView.extend(
     }
     );
 
+var ItemImageForm = StaticView.extend(
+    {
+        initialize: function() {
+            StaticView.prototype.initialize.apply(this, arguments);
+            this.on('destroy', this.showDestroyDialog.bind(this));
+            this.on('save', this.save.bind(this));
+        },
+        template: $('#itemimageform-template').html(),
+        templateParams: function() {
+            return _(_.clone(this.model.attributes)).extend({
+                url: this.model.urlMedium(),
+                alt: this.model.get('attachment_title')
+            });
+        },
+        showDestroyDialog: function() {
+            gApplication.modal(
+                new ConfirmModal({
+                    message: 'Are you sure you want to delete this image?',
+                    callback: (function() {
+                        this.model.destroy();
+                        this.trigger('finished');
+                    }).bind(this)
+                })
+                );
+        },
+        save: function() {
+            this.model.set({
+                attachment_title: this.$('input[name=attachment_title]').val()
+            });
+            this.model.save(
+                {},
+                {
+                    success: (function() {
+                        this.trigger('finished');
+                    }).bind(this)
+                }
+                );
+        }
+    }
+    );
+
 var ItemPage = PageView.extend(
     {
         pageTitle: function() { return this.model.get('item_name'); },
@@ -192,32 +233,9 @@ var ItemPage = PageView.extend(
                         //this.model.fetch();
                         var attachment = this.model;
                         var m = new Modal({
-                            buttons: { close: true, destroy: true },
+                            buttons: { close: true, destroy: true, save: true },
                             model: this.model,
-                            view: StaticView.extend({
-                                initialize: function() {
-                                    StaticView.prototype.initialize.apply(this, arguments);
-                                    this.on('destroy', this.showDestroyDialog.bind(this));
-                                },
-                                template: $('#itemimageform-template').html(),
-                                templateParams: function() {
-                                    return _(_.clone(this.model.attributes)).extend({
-                                        url: this.model.urlMedium(),
-                                        alt: this.model.get('attachment_title')
-                                    });
-                                },
-                                showDestroyDialog: function() {
-                                    gApplication.modal(
-                                        new ConfirmModal({
-                                            message: 'Are you sure you want to delete this image?',
-                                            callback: (function() {
-                                                this.model.destroy();
-                                                this.trigger('finished');
-                                            }).bind(this)
-                                        })
-                                        );
-                                }
-                            })
+                            view: ItemImageForm
                         });
                         gApplication.modal(m);
                     }

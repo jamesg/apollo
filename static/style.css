@@ -166,7 +166,7 @@ a {
     bottom: 0;
     left: 0;
     z-index: 1040;
-    background-color: rgba(127, 127, 127, 0.5);
+    background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQImWO4e/fufwYYuHv37n8AQDgHLf1vMaoAAAAASUVORK5CYII=) repeat;
 }
 
 .modal-dialog {
