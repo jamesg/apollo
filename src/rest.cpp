@@ -4,9 +4,11 @@
 #include "atlas/http/server/server.hpp"
 #include "hades/crud.ipp"
 #include "hades/custom_select.hpp"
+#include "hades/devoid.hpp"
 #include "hades/exists.hpp"
 #include "hades/join.hpp"
 #include "hades/mkstr.hpp"
+#include "styx/cast.hpp"
 
 #include "db.hpp"
 
@@ -17,6 +19,67 @@ namespace
 
 void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
 {
+    // Options.
+    server.router().install<std::string>(
+        atlas::http::matcher("/option/([^/]+)", "DELETE"),
+        [&conn](const std::string option_name) {
+            if(
+                hades::devoid(
+                    "DELETE FROM option WHERE option_name = ?",
+                    hades::row<std::string>(option_name),
+                    conn
+                    ) == 1
+              )
+                return atlas::http::json_response(true);
+            else
+                return atlas::http::json_error_response("deleting option");
+        }
+        );
+    server.router().install<std::string>(
+        atlas::http::matcher("/option/([^/]+)", "GET"),
+        [&conn](const std::string option_name) {
+            return atlas::http::json_response(
+                hades::get_one<option>(
+                    conn,
+                    hades::where("option_name = ?", hades::row<std::string>(option_name))
+                    )
+                );
+        }
+        );
+    server.router().install<>(
+        atlas::http::matcher("/option", "GET"),
+        [&conn]() {
+            styx::list l = hades::get_collection<option>(conn);
+            styx::object out;
+            for(const styx::element& e : l)
+            {
+                option o(e);
+                out.get_string(o.get_string<attr::option_name>()) =
+                    o.get_string<attr::option_value>();
+            }
+            return atlas::http::json_response(out);
+        }
+        );
+    server.router().install_json<>(
+        atlas::http::matcher("/option", "PUT"),
+        [&conn](const styx::element e) {
+            styx::object o(e);
+            for(const std::pair<std::string, styx::element> p : o)
+            {
+                option(p.first, styx::cast<std::string>(p.second)).save(conn);
+            }
+
+            styx::list l = hades::get_collection<option>(conn);
+            styx::object out;
+            for(const styx::element& e : l)
+            {
+                option o(e);
+                out.get_string(o.get_string<attr::option_name>()) =
+                    o.get_string<attr::option_value>();
+            }
+            return atlas::http::json_response(out);
+        }
+        );
     // Type collection.
     server.router().install<>(
         atlas::http::matcher("/type", "GET"),

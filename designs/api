@@ -31,3 +31,9 @@ Attachments
 * /attachment/<attachment_id>/image/<width>x<height> [GET] - download a scaled image
 * /attachment/<attachment_id>/info [DELETE, GET, PUT] - attachment metadata
 
+Options
+=======
+
+* /option [GET, PUT] - get all options or update multiple options (options not set in a PUT will be left)
+* /option/<option_name> [DELETE, GET, PUT] - delete, get or update a single option
+

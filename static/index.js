@@ -53,6 +53,59 @@ var MakerPage = PageView.extend(
     }
     );
 
+var TypePage = PageView.extend(
+    {
+        pageTitle: function() { return this.model.get('type_name'); },
+        events: {
+            'click button[name=new-item]': 'showCreateDialog'
+        },
+        initialize: function() {
+            PageView.prototype.initialize.apply(this, arguments);
+            this.model.fetch();
+
+            this.$el.html(this.template(this.templateParams()));
+
+            //this._detailsView = new StaticView({
+                //el: this.$('div[name=details]'),
+                //model: this.model,
+                //template: $('#typedetails-template').html()
+            //});
+            //this._detailsView.render();
+
+            this._items = new TypeItems([], { type: this.model });
+            this._items.fetch();
+
+            (new CollectionView({
+                model: this._items,
+                el: this.$('ul[name=items]'),
+                view: StaticView.extend({
+                    tagName: 'li',
+                    template: '<%-item_name%>',
+                    events: { click: 'gotoItem' },
+                    gotoItem: function() {
+                        gApplication.pushPage(new ItemPage({ model: this.model }));
+                    }
+                }),
+                emptyView: StaticView.extend({
+                    tagName: 'li',
+                    template: 'This maker does not have any items.'
+                })
+            })).render();
+        },
+        showCreateDialog: function() {
+            var newItem = new Item({ type_id: this.model.get('type_id') });
+            var m = new Modal({
+                buttons: { cancel: true, create: true },
+                model: newItem,
+                view: ItemForm
+            });
+            gApplication.modal(m);
+            this.listenTo(m, 'finished', this._items.fetch.bind(this._items));
+        },
+        template: _.template($('#typepage-template').html())
+    }
+    );
+
 var ItemForm = StaticView.extend(
     {
         initialize: function(options) {
@@ -245,7 +298,8 @@ var ItemPage = PageView.extend(
         template: _.template($('#itempage-template').html()),
         events: {
             'click button[name=edit]': 'edit',
-            'click button[name=addimage]': 'addImage'
+            'click button[name=addimage]': 'addImage',
+            'click button[name=destroy]': 'destroy'
         },
         edit: function() {
             var m = new Modal({
@@ -271,6 +325,20 @@ var ItemPage = PageView.extend(
                 m,
                 'finished',
                 (function() { this._imageCollection.fetch(); }).bind(this)
+                );
+        },
+        destroy: function() {
+            gApplication.modal(
+                new ConfirmModal({
+                    message: 'Are you sure you want to delete "' + this.model.get('item_name') + '"?',
+                    callback: (function() {
+                        this.model.destroy({
+                            success: function() {
+                                gApplication.popPage();
+                            }
+                        });
+                    }).bind(this)
+                })
                 );
         }
     }
@@ -331,7 +399,17 @@ var HomePage = PageView.extend(
                 {
                     el: this.$('#top-types'),
                     model: this._topTypes,
-                    view: StaticView.extend({ tagName: 'li', template: '<%-type_name%>' })
+                    limit: 5,
+                    view: StaticView.extend({
+                        tagName: 'li',
+                        template: '<%-type_name%>',
+                        events: { 'click': 'gotoType' },
+                        gotoType: function() {
+                            gApplication.pushPage(
+                                new TypePage({ model: this.model })
+                                );
+                        }
+                    })
                 }
                 );
             typesList.render();

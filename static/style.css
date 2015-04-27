@@ -245,5 +245,6 @@ span.disabled {
 }
 
 .image-list li {
+    display: inline-block;
 }
 

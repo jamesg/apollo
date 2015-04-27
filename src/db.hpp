@@ -10,6 +10,8 @@ namespace apollo
 {
     namespace attr
     {
+        extern const char option_name[];
+        extern const char option_value[];
         extern const char type_id[];
         extern const char type_name[];
         extern const char item_id[];
@@ -27,12 +29,36 @@ namespace apollo
     }
     namespace relvar
     {
+        extern const char option[];
         extern const char type[];
         extern const char item[];
         extern const char maker[];
         extern const char attachment[];
         extern const char image_of[];
     }
+
+    class option :
+        public hades::tuple<attr::option_name, attr::option_value>,
+        public hades::has_candidate_key<attr::option_name>,
+        public hades::relation<relvar::option>,
+        public hades::crud<option>
+    {
+    public:
+        option()
+        {
+        }
+
+        option(const styx::element& e) :
+            styx::object(e)
+        {
+        }
+
+        option(const std::string& name, const std::string& value)
+        {
+            get_string<attr::option_name>() = name;
+            get_string<attr::option_value>() = value;
+        }
+    };
 
     class type :
         public hades::tuple<attr::type_id, attr::type_name>,

@@ -64,6 +64,12 @@
 <ul name="items" class="text-list action-list"></ul>
 </script>
 
+<script type="text/template" id="typepage-template">
+<div name="details"></div>
+<div class="button-box"><button name="new-item">New <%-type_name%> Item</button></div>
+<ul name="items" class="text-list action-list"></ul>
+</script>
+
 <script type="text/template" id="makerdetails-template">
 <p>Maker name: <%-maker_name%>
 </script>
@@ -135,7 +141,10 @@
 </script>
 
 <script type="text/template" id="itempage-template">
-<div class="button-box"><button name="edit">Edit Item</button></div>
+<div class="button-box">
+    <button name="edit">Edit Item</button>
+    <button name="destroy">Delete Item</button>
+</div>
 <h1><%-item_name%></h1>
 
 <h2>Images</h2>
@@ -176,7 +185,11 @@
 
 <script type="text/template" id="itemimageform-template">
 <h2><%-attachment_title%></h2>
+<figure>
 <img src="<%-url%>" alt="<%-alt%>">
+<br>
+<caption><%-alt%></caption>
+</figure>
 
 <label for="attachment_title">Title</label>
 <input type="text" name="attachment_title" value="<%-attachment_title%>">

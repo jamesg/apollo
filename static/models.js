@@ -156,3 +156,27 @@ var MakerItems = RestCollection.extend(
     }
     );
 
+var TypeItems = RestCollection.extend(
+    {
+        model: Item,
+        initialize: function(items, options) {
+            RestCollection.prototype.initialize.apply(this, arguments);
+            this._type = options.type;
+        },
+        url: function() { return '/type/' + this._type.get('type_id') + '/item'; }
+    }
+    );
+
+/*
+ * Monostate options object - simple key/value settings for the whole application.
+ */
+var Options = RestModel.extend(
+    {
+        defaults: {
+            collection_name: ''
+        },
+        url: '/option',
+        isNew: function() { return false; }
+    }
+    );
+

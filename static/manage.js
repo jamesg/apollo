@@ -116,9 +116,20 @@ var ManageHomePage = PageView.extend(
         pageTitle: 'Manage Collection',
         render: function() {},
         template: _.template($('#manage-homepage').html()),
+        events: {
+            'click button[name=show-options]': 'showOptions'
+        },
+        showOptions: function() {
+            gApplication.modal(
+                new Modal({
+                    buttons: { save: true, cancel: true },
+                    view: OptionsForm,
+                    model: new Options
+                })
+                );
+        },
         initialize: function(options) {
             PageView.prototype.initialize.apply(this, arguments);
-            this._application = options.application;
 
             this._makers = new MakerCollection();
             this._makers.fetch();
@@ -149,7 +160,7 @@ var ManageHomePage = PageView.extend(
                             view: TypeForm
                         }
                         );
-                    this._application.modal(m);
+                    gApplication.modal(m);
                     this.listenTo(m, 'finished', this._types.fetch.bind(this._types));
                 }).bind(this)
                 );
@@ -193,6 +204,33 @@ var ManageHomePage = PageView.extend(
                     }
                     })
                 })).render();
+        }
+    }
+    );
+
+var OptionsForm = StaticView.extend(
+    {
+        template: $('#optionsform-template').html(),
+        initialize: function(options) {
+            StaticView.prototype.initialize.apply(this, arguments);
+            this.model.fetch();
+            this.render();
+            this.on('save', this.save.bind(this));
+        },
+        save: function() {
+            this.model.set(
+                {
+                    collection_name: this.$('input[name=collection_name]').val()
+                }
+                );
+            this.model.save(
+                {},
+                {
+                    success: (function() {
+                        this.trigger('finished');
+                    }).bind(this)
+                }
+                );
         }
     }
     );
