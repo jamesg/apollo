@@ -188,7 +188,7 @@ var BreadcrumbView = StaticView.extend(
     {
         tagName: 'span',
         revisit: function revisit() {
-            this.application.revisit(this.model);
+            gApplication.revisit(this.model);
         },
         events: {
             'click a': 'revisit'
@@ -215,47 +215,16 @@ var BreadcrumbsView = CollectionView.extend(
     }
     );
 
-var Navigation = Backbone.View.extend(
-    {
-        tagName: 'div',
-        className: 'navigation',
-        initialize: function(options) {
-            this.application = options.application;
-            this._breadcrumbs = options.breadcrumbs;
-            this._breadcrumbsView = new BreadcrumbsView(
-                { application: this.application, model: this._breadcrumbs }
-                );
-            this._active = true;
-            this.render();
-        },
-        setBreadcrumbs: function(breadcrumbs) {
-            this._breadcrumbs = breadcrumbs;
-            this.render();
-        },
-        render: function() {
-            this.$el.empty();
-            this.$el.append(this._breadcrumbsView.$el);
-            return this;
-        },
-        templateParams: function() { return {}; },
-        template: ''
-        //function() {
-            //div({ class: 'signin' }, this._signInView.el);
-            //div(
-                //{ class: 'navigation navigation-' + (this._active?'active':'inactive') },
-                //h1('Atlas ', small('Intelligent Heating Controller'))
-                //);
-            //div({ class: 'breadcrumbs' }, this._breadcrumbsView.el);
-        //}
-    }
-    );
-
 var StackedApplication = function(homeView) {
     this._homeView = homeView;
 
     this.breadcrumbs = new BreadcrumbCollection;
-    this.navigation = new Navigation(
-            { application: this, breadcrumbs: this.breadcrumbs, el: $('#navigation') }
+    this.navigation = new CollectionView(
+            {
+                el: $('#navigation'),
+                model: this.breadcrumbs,
+                view: BreadcrumbView
+            }
             );
 
     this.goHome();
@@ -359,13 +328,7 @@ StackedApplication.prototype.authenticationError = function() {
 var PageView = StaticView.extend(
     {
         pageTitle: 'Untitled Page',
-        initialize: function(options) {
-            StaticView.prototype.initialize.apply(this, arguments);
-            if(_.has(options, 'application'))
-                this.application = options.application;
-        },
-        reset: function() {
-        }
+        reset: function() { }
     }
     );
 
