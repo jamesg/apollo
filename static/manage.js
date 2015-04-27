@@ -35,7 +35,11 @@ var MakerForm = StaticView.extend(
         destroy: function() {
             gApplication.modal(
                 new ConfirmModal({
-                    message: 'Are you sure you want to delete \'' + this.model.get('maker_name') +'\'?',
+                    message: 'Are you sure you want to delete \'' +
+                        this.model.get('maker_name') +
+                        '\'?  Items made by \'' +
+                        this.model.get('maker_name') +
+                        '\' will be reclassified as \'Unknown\'',
                     callback: (function() {
                         this.model.destroy();
                         this.trigger('finished');
@@ -93,7 +97,11 @@ var TypeForm = StaticView.extend(
         destroy: function() {
             gApplication.modal(
                 new ConfirmModal({
-                    message: 'Are you sure you want to delete \'' + this.model.get('type_name') +'\'?',
+                    message: 'Are you sure you want to delete \'' +
+                        this.model.get('type_name') +
+                        '\'?  Items classified as by \'' +
+                        this.model.get('type_name') +
+                        '\' will be reclassified as \'Unknown\'',
                     callback: (function() {
                         this.model.destroy();
                         this.trigger('finished');
@@ -179,7 +187,7 @@ var ManageHomePage = PageView.extend(
                                 model: this.model,
                                 view: MakerForm
                         });
-                        page._application.modal(m);
+                        gApplication.modal(m);
                         page.listenTo(m, 'finished', page._makers.fetch.bind(page._makers));
                     }
                     })
@@ -199,7 +207,7 @@ var ManageHomePage = PageView.extend(
                                 view: TypeForm
                             }
                             );
-                        page._application.modal(m);
+                        gApplication.modal(m);
                         page.listenTo(m, 'finished', page._types.fetch.bind(page._types));
                     }
                     })

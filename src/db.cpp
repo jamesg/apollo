@@ -1,6 +1,8 @@
 #include "db.hpp"
 
 #include "hades/devoid.hpp"
+#include "hades/exists.hpp"
+#include "hades/filter.hpp"
 
 const char apollo::attr::option_name[] = "option_name";
 const char apollo::attr::option_value[] = "option_value";
@@ -41,6 +43,23 @@ void apollo::db::create(hades::connection& conn)
         " ) ",
         conn
         );
+    if(!hades::exists<type>(conn, hades::where("type_id = 0")))
+        hades::devoid(
+            "INSERT INTO type(type_id, type_name) VALUES(0, 'Unknown')",
+            conn
+            );
+    hades::devoid(
+        "CREATE TABLE IF NOT EXISTS maker ( "
+        " maker_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        " maker_name VARCHAR "
+        " ) ",
+        conn
+        );
+    if(!hades::exists<maker>(conn, hades::where("maker_id = 0")))
+        hades::devoid(
+            "INSERT INTO maker(maker_id, maker_name) VALUES(0, 'Unknown')",
+            conn
+            );
     hades::devoid(
         "CREATE TABLE IF NOT EXISTS item ( "
         " item_id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -51,13 +70,6 @@ void apollo::db::create(hades::connection& conn)
         " item_year INTEGER, "
         " item_cond INTEGER DEFAULT 0, "
         " item_cond_notes VARCHAR "
-        " ) ",
-        conn
-        );
-    hades::devoid(
-        "CREATE TABLE IF NOT EXISTS maker ( "
-        " maker_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        " maker_name VARCHAR "
         " ) ",
         conn
         );

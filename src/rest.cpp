@@ -113,26 +113,16 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
     server.router().install<int>(
         atlas::http::matcher("/type/([0-9]+)", "DELETE"),
         [&conn](const int type_id) {
+            if(type_id == 0)
+                return atlas::http::json_error_response("cannot delete the 'unknown' type");
+
+            hades::devoid(
+                "UPDATE item SET type_id = 0 WHERE type_id = ?",
+                hades::row<int>(type_id),
+                conn
+                );
             type t;
             t.set_id(type::id_type{type_id});
-            if(t.destroy(conn))
-                return atlas::http::json_response(t);
-            else
-                return atlas::http::json_error_response("deleting type");
-        }
-        );
-    server.router().install<std::string>(
-        atlas::http::matcher("/type/([a-z]+)", "DELETE"),
-        [&conn](const std::string type_name) {
-            type t(
-                hades::get_one<type>(
-                    conn,
-                    hades::where(
-                        "type_name = ?",
-                        hades::row<std::string>(type_name)
-                        )
-                    )
-                );
             if(t.destroy(conn))
                 return atlas::http::json_response(t);
             else
@@ -147,20 +137,6 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install<std::string>(
-        atlas::http::matcher("/type/([a-z]+)", "GET"),
-        [&conn](const std::string type_name) {
-            return atlas::http::json_response(
-                hades::get_one<type>(
-                    conn,
-                    hades::where(
-                        "type_name = ?",
-                        hades::row<std::string>(type_name)
-                        )
-                    )
-                );
-        }
-        );
 
     // Type item collection.
     server.router().install<int>(
@@ -172,20 +148,6 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                     hades::where(
                         "type.type_id = item.type_id AND type.type_id = ?",
                         hades::row<int>(type_id)
-                        )
-                    )
-                );
-        }
-        );
-    server.router().install<std::string>(
-        atlas::http::matcher("/type/([a-z]+)/item", "GET"),
-        [&conn](const std::string type_name) {
-            return atlas::http::json_response(
-                hades::join<type, item>(
-                    conn,
-                    hades::where(
-                        "type.type_id = item.type_id AND type.type_name = ?",
-                        hades::row<std::string>(type_name)
                         )
                     )
                 );
@@ -310,6 +272,14 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
     server.router().install<int>(
         atlas::http::matcher("/maker/([0-9]+)", "DELETE"),
         [&conn](const int maker_id) {
+            if(maker_id == 0)
+                return atlas::http::json_error_response("cannot delete the 'unknown' maker");
+
+            hades::devoid(
+                "UPDATE item SET maker_id = 0 WHERE maker_id = ?",
+                hades::row<int>(maker_id),
+                conn
+                );
             maker m;
             m.set_id(maker::id_type{maker_id});
             if(m.destroy(conn))
