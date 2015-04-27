@@ -73,6 +73,14 @@ body {
     font-size: large;
 }
 
+.navigation a {
+    color: black;
+}
+
+.navigation li {
+    display: inline-block;
+}
+
 .content {
     background-color: white;
     border: 1px solid black;

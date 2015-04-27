@@ -17,27 +17,65 @@
 <body>
 
 <div id="modal-container" class="modal-container"></div>
+<ul class="navigation">
+    <li>
+        <span class="oi" data-glyph="home" aria-hidden="true"> </span>
+        <a href="index.html">Home</a>
+    </li>
+    <li>
+        <span class="oi" data-glyph="list" aria-hidden="true"> </span>
+        <a href="manage.html">Manage</a>
+    </li>
+</ul>
 <ul id="navigation" class="navigation"></ul>
 <div id="template-content" class="content"></div>
 
 <script type="text/template" id="modal-template">
 <div class="modal">
     <div class="modal-dialog">
-        <form>
-            <div class="modal-content" name="modal-content">
-            </div>
+        <form class="modal-content" name="modal-content">
         </form>
     </div>
     <div class="modal-button-box">
-        <% if(_(buttons).has(['close'])) print('<button type="button" name="close">Close</button>'); %>
+        <% if(_(buttons).has(['close'])) { %>
+        <button type="button" name="close">
+            <span class="oi" data-glyph="x" aria-hidden="true"> </span>
+            Close
+        </button>
+        <% } %>
         <% if(_(buttons).has(['cancel'])) print('<button type="button" name="cancel">Cancel</button>'); %>
-        <% if(_(buttons).has(['no'])) print('<button type="button" name="no">No</button>'); %>
+        <% if(_(buttons).has(['no'])) { %>
+        <button type="button" name="no">
+            <span class="oi" data-glyph="x" aria-hidden="true"> </span>
+            No
+        </button>
+        <% } %>
 
-        <% if(_(buttons).has(['destroy'])) print('<button class="button-warning" type="button" name="delete">Delete</button>'); %>
 
-        <% if(_(buttons).has(['save'])) print('<button class="button-primary" type="button" name="save">Save</button>'); %>
-        <% if(_(buttons).has(['create'])) print('<button type="button" name="create">Create</button>'); %>
-        <% if(_(buttons).has(['yes'])) print('<button type="button" name="yes">Yes</button>'); %>
+        <% if(_(buttons).has(['destroy'])) { %>
+        <button type="button" name="destroy">
+            <span class="oi" data-glyph="trash" aria-hidden="true"> </span>
+            Delete
+        </button>
+        <% } %>
+        <% if(_(buttons).has(['save'])) { %>
+        <button type="button" name="save">
+            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
+            Save
+        </button>
+        <% } %>
+        <% if(_(buttons).has(['create'])) { %>
+        <button type="button" name="create">
+            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
+            Create
+        </button>
+        <% } %>
+        <% if(_(buttons).has(['yes'])) { %>
+        <button type="button" name="yes">
+            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
+            Yes
+        </button>
+        <% } %>
     </div>
 </div>
 </script>
@@ -47,7 +85,10 @@
 <h1>Management</h1>
 
 <div class="button-box">
-    <button name="show-options">Options</button>
+    <button name="show-options">
+        <span class="oi" data-glyph="cog" aria-hidden="true"> </span>
+        Options
+    </button>
 </div>
 
 <div class="grid">

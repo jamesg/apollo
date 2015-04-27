@@ -186,7 +186,7 @@ var BreadcrumbCollection = Backbone.Collection.extend(
 
 var BreadcrumbView = StaticView.extend(
     {
-        tagName: 'span',
+        tagName: 'li',
         revisit: function revisit() {
             gApplication.revisit(this.model);
         },
