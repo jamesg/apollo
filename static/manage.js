@@ -132,7 +132,7 @@ var ManageHomePage = PageView.extend(
                 new Modal({
                     buttons: { save: true, cancel: true },
                     view: OptionsForm,
-                    model: new Options
+                    model: gApplication.options()
                 })
                 );
         },
@@ -140,11 +140,23 @@ var ManageHomePage = PageView.extend(
             PageView.prototype.initialize.apply(this, arguments);
 
             this._makers = new MakerCollection();
+            this._makers.comparator = function(x) {
+                return (x.get('maker_id')==0)?0:x.get('maker_name');
+            };
             this._makers.fetch();
-            this._types = new TypeCollection();
+            this._types = new TypeCollection;
+            this._types.comparator = function(x) {
+                return (x.get('type_id')==0)?0:x.get('type_name');
+            };
             this._types.fetch();
 
             this.$el.html(this.template());
+            (new StaticView({
+                el: this.$('[name=application_title]'),
+                template: '<%-collection_name%>',
+                model: gApplication.options()
+            })).render();
+
 
             this.$('button[name=new-maker]').on(
                 'click',

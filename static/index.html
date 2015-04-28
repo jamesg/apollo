@@ -81,7 +81,7 @@
 </script>
 
 <script type="text/template" id="homepage-template">
-<h1>Computer Collection</h1>
+<h1 name="application_title"></h1>
 <div class="grid">
     <div class="col-1-3">
         <h2>Top Five Makers</h2>
@@ -93,7 +93,11 @@
     </div>
     <div class="col-1-3">
         <h2>Tools</h2>
-        <a href="manage.html">Manage Collection</a>
+        <ul class="text-list action-list">
+            <li><a href="manage.html">Manage Collection</a></li>
+            <li><a name="new-item">New Item</a></li>
+            <li><a name="makercollection">All Makers</a></li>
+        </ul>
     </div>
 </div>
 </script>
@@ -129,13 +133,13 @@
 <div class="aligned">
     <div class="group">
     <label for="type_id">Type</label>
-    <select name="type_id" value="<%-type_id%>">
+    <select name="type_id">
     </select>
     </div>
 
     <div class="group">
     <label for="maker_id">Maker</label>
-    <select name="maker_id" value="<%-maker_id%>">
+    <select name="maker_id">
     </select>
     </div>
 
@@ -246,6 +250,16 @@
 </label>
 </script>
 
+<script type="text/template" id="typecollectionpage-template">
+<h2>Types</h2>
+<ul class="action-list action-list-large text-list" name="types"></ul>
+</script>
+
+<script type="text/template" id="makercollectionpage-template">
+<h2>Makers</h2>
+<ul class="action-list action-list-large text-list" name="makers"></ul>
+</script>
+
 <script type="text/javascript" src="underscore.js"></script>
 <script type="text/javascript" src="backbone.js"></script>
 <script type="text/javascript" src="jquery.js"></script>
@@ -255,7 +269,8 @@
 <script type="text/javascript" src="index.js"></script>
 <script type="text/javascript">
 Backbone.$ = $;
-var gApplication = new StackedApplication(HomePage);
+var gApplication = new Application(HomePage);
+gApplication.goHome();
 </script>
 
 </body>

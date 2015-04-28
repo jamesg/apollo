@@ -84,7 +84,15 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
     server.router().install<>(
         atlas::http::matcher("/type", "GET"),
         [&conn]() {
-            return atlas::http::json_response(type::get_collection(conn));
+            return atlas::http::json_response(
+                hades::custom_select<type, attr::type_id, attr::type_name, item_count>(
+                    conn,
+                    "SELECT type.type_id, type.type_name, COUNT(item.item_id) "
+                    "FROM type LEFT OUTER JOIN item "
+                    "ON type.type_id = item.type_id "
+                    "GROUP BY type.type_id "
+                    )
+                );
         }
         );
     server.router().install_json<>(
@@ -135,6 +143,14 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
             return atlas::http::json_response(
                 hades::get_by_id<type>(conn, type::id_type{type_id})
                 );
+        }
+        );
+    server.router().install_json<int>(
+        atlas::http::matcher("/type/([0-9]+)", "PUT"),
+        [&conn](const styx::element e, const int type_id) {
+            type t(e);
+            t.update(conn);
+            return atlas::http::json_response(t);
         }
         );
 
@@ -237,8 +253,8 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
             return atlas::http::json_response(
                 hades::custom_select<maker, attr::maker_id, attr::maker_name, item_count>(
                     conn,
-                    "SELECT maker.maker_id, maker_name, COUNT(item_id) FROM maker "
-                    "LEFT JOIN item "
+                    "SELECT maker.maker_id, maker.maker_name, COUNT(item.item_id) "
+                    "FROM maker LEFT OUTER JOIN item "
                     "ON maker.maker_id = item.maker_id "
                     "GROUP BY maker.maker_id "
                     )

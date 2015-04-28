@@ -145,6 +145,8 @@ var ItemForm = StaticView.extend(
                 );
         },
         render: function() {
+            var itemForm = this;
+
             this.$el.html(this.template(this.templateParams()));
             this._messageBox =
                 new MessageBox({ el: this.$('div[name=messagebox]') });
@@ -154,7 +156,10 @@ var ItemForm = StaticView.extend(
                 view: StaticView.extend({
                     tagName: 'option',
                     attributes: function() {
-                        return { value: this.model.get('maker_id') };
+                        return {
+                            value: this.model.get('maker_id'),
+                            selected: (itemForm.model.get('maker_id') == this.model.get('maker_id'))
+                        };
                     },
                     template: '<%-maker_name%>'
                 })
@@ -165,7 +170,10 @@ var ItemForm = StaticView.extend(
                 view: StaticView.extend({
                     tagName: 'option',
                     attributes: function() {
-                        return { value: this.model.get('type_id') };
+                        return {
+                            value: this.model.get('type_id'),
+                            selected: (itemForm.model.get('type_id') == this.model.get('type_id'))
+                        };
                     },
                     template: '<%-type_name%>'
                 })
@@ -264,11 +272,14 @@ var ItemPage = PageView.extend(
             PageView.prototype.initialize.apply(this, arguments);
             this.model.fetch();
 
-            this.$el.html(this.template(this.templateParams()));
-
             this._imageCollection = new ItemImageCollection([], { item: this.model });
             this._imageCollection.fetch();
-            var imageCollectionView = new CollectionView({
+
+            this.render();
+        },
+        render: function() {
+            this.$el.html(this.template(this.templateParams()));
+            (new CollectionView({
                 model: this._imageCollection,
                 el: this.$('ul[name=images]'),
                 view: StaticView.extend({
@@ -293,7 +304,7 @@ var ItemPage = PageView.extend(
                         gApplication.modal(m);
                     }
                 })
-            })
+            })).render();
         },
         template: _.template($('#itempage-template').html()),
         events: {
@@ -344,9 +355,67 @@ var ItemPage = PageView.extend(
     }
     );
 
+var TypeCollectionPage = PageView.extend(
+    {
+        pageTitle: 'Types',
+        initialize: function() {
+            PageView.prototype.initialize.apply(this, arguments);
+            this.render();
+            var model = new TypeCollection;
+            model.fetch();
+            (new CollectionView({
+                el: this.$('ul[name=types]'),
+                model: model,
+                view: StaticView.extend({
+                    tagName: 'li',
+                    template: '<%-type_name%>',
+                    events: { click: 'gotoType' },
+                    gotoType: function() {
+                        gApplication.pushPage(
+                            new TypePage({ model: this.model })
+                            );
+                    }
+                })
+            })).render();
+        },
+        template: $('#typecollectionpage-template').html()
+    }
+    );
+
+var MakerCollectionPage = PageView.extend(
+    {
+        pageTitle: 'Makers',
+        initialize: function() {
+            PageView.prototype.initialize.apply(this, arguments);
+            this.render();
+            var model = new MakerCollection;
+            model.fetch();
+            (new CollectionView({
+                el: this.$('ul[name=makers]'),
+                model: model,
+                view: StaticView.extend({
+                    tagName: 'li',
+                    template: '<%-maker_name%>',
+                    events: { click: 'gotoMaker' },
+                    gotoMaker: function() {
+                        gApplication.pushPage(
+                            new MakerPage({ model: this.model })
+                            );
+                    }
+                })
+            })).render();
+        },
+        template: $('#makercollectionpage-template').html()
+    }
+    );
+
 var HomePage = PageView.extend(
     {
         pageTitle: 'Computer Collection',
+        events: {
+            'click a[name=new-item]': 'showCreateDialog',
+            'click a[name=makercollection]': 'gotoMakers'
+        },
         initialize: function(options) {
             PageView.prototype.initialize.apply(this, arguments);
 
@@ -372,6 +441,11 @@ var HomePage = PageView.extend(
             this._topTypes.fetch();
 
             this.$el.html(this.template());
+            (new StaticView({
+                el: this.$('[name=application_title]'),
+                template: '<%-collection_name%>',
+                model: gApplication.options()
+            })).render();
 
             // View of the top 5 makers (limited to 5 here, the model is
             // already sorted).
@@ -413,6 +487,25 @@ var HomePage = PageView.extend(
                 }
                 );
             typesList.render();
+        },
+        showCreateDialog: function() {
+            var m = new Modal({
+                buttons: { cancel: true, create: true },
+                model: new Item,
+                view: ItemForm
+            });
+            gApplication.modal(m);
+            this.listenTo(
+                    m,
+                    'finished',
+                    (function() {
+                        this._topMakers.fetch();
+                        this._topTypes.fetch();
+                    }).bind(this)
+                    );
+        },
+        gotoMakers: function() {
+            gApplication.pushPage(MakerCollectionPage);
         },
         template: _.template($('#homepage-template').html())
     }

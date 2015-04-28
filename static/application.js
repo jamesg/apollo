@@ -330,3 +330,18 @@ var TableView = StaticView.extend(
     //}
     //);
 
+var Application = function(homeView) {
+    StackedApplication.apply(this, arguments);
+    this._options = new Options;
+    this._options.fetch();
+};
+
+Application.prototype = Object.create(StackedApplication.prototype);
+
+/*
+ * Get the global application options, such as the collection name.
+ */
+Application.prototype.options = function() {
+    return this._options;
+};
+

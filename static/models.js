@@ -173,7 +173,7 @@ var TypeItems = RestCollection.extend(
 var Options = RestModel.extend(
     {
         defaults: {
-            collection_name: ''
+            collection_name: 'New Collection'
         },
         url: '/option',
         isNew: function() { return false; }

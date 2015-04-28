@@ -227,10 +227,10 @@ var StackedApplication = function(homeView) {
             }
             );
 
-    this.goHome();
+    //this.goHome();
 };
 
-_.extend(StackedApplication, Backbone.Events);
+//_.extend(StackedApplication, Backbone.Events);
 
 StackedApplication.prototype._setElement = function(el) {
     document.getElementById('template-content').innerHTML = '';

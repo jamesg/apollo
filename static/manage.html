@@ -82,7 +82,8 @@
 
 <script type="text/template" id="manage-homepage">
 <div name="modal-container"></div>
-<h1>Management</h1>
+<h1 name="application_title"></h1>
+<h2>Management</h2>
 
 <div class="button-box">
     <button name="show-options">
@@ -143,7 +144,8 @@
 <script type="text/javascript" src="manage.js"></script>
 <script type="text/javascript">
 Backbone.$ = $;
-var gApplication = new StackedApplication(ManageHomePage);
+var gApplication = new Application(ManageHomePage);
+gApplication.goHome();
 </script>
 
 </body>
