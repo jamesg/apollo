@@ -175,7 +175,10 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         atlas::http::matcher("/item", "GET"),
         [&conn]() {
             return atlas::http::json_response(
-                hades::get_collection<item>(conn)
+                hades::join<item, maker>(
+                    conn,
+                    hades::where("item.maker_id = maker.maker_id")
+                    )
                 );
         }
         );

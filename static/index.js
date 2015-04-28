@@ -382,6 +382,43 @@ var TypeCollectionPage = PageView.extend(
     }
     );
 
+var TimelinePage = PageView.extend(
+    {
+        pageTitle: 'Timeline',
+        initialize: function() {
+            this.model = new ItemCollection(
+                [],
+                {
+                    comparator: function(x) {
+                        return - x.get('item_year');
+                    }
+                }
+                );
+            this.model.fetch();
+
+            this.render();
+        },
+        template: $('#timelinepage-template').html(),
+        render: function() {
+            this.$el.html(_.template(this.template)(this.templateParams()));
+            (new CollectionView({
+                el: this.$('ul[name=items]'),
+                model: this.model,
+                view: StaticView.extend({
+                    tagName: 'li',
+                    template: '<%-item_year%>: <%-item_name%> (<%-maker_name%>)',
+                    events: { click: 'gotoItem' },
+                    gotoItem: function() {
+                        gApplication.pushPage(
+                            new ItemPage({ model: this.model })
+                            );
+                    }
+                })
+            })).render();
+        }
+    }
+    );
+
 var MakerCollectionPage = PageView.extend(
     {
         pageTitle: 'Makers',
@@ -413,8 +450,10 @@ var HomePage = PageView.extend(
     {
         pageTitle: 'Computer Collection',
         events: {
-            'click a[name=new-item]': 'showCreateDialog',
-            'click a[name=makercollection]': 'gotoMakers'
+            'click [name=new-item]': 'showCreateDialog',
+            'click [name=makercollection]': 'gotoMakers',
+            'click [name=typecollection]': 'gotoTypes',
+            'click [name=timeline]': 'gotoTimeline'
         },
         initialize: function(options) {
             PageView.prototype.initialize.apply(this, arguments);
@@ -506,6 +545,12 @@ var HomePage = PageView.extend(
         },
         gotoMakers: function() {
             gApplication.pushPage(MakerCollectionPage);
+        },
+        gotoTypes: function() {
+            gApplication.pushPage(TypeCollectionPage);
+        },
+        gotoTimeline: function() {
+            gApplication.pushPage(TimelinePage);
         },
         template: _.template($('#homepage-template').html())
     }
