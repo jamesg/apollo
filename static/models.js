@@ -3,6 +3,13 @@
 // date if required.  In the case of array responses, returning a raw array is
 // also a potential security risk.
 
+/*
+ * Get the URI for a REST API handler.
+ */
+var restUri = function(fragment) {
+    return '/api' + fragment;
+};
+
 var RestCollection = Backbone.Collection.extend(
         {
             parse: function(response) {
@@ -36,7 +43,7 @@ var Type = RestModel.extend(
                 return errors;
         },
         url: function() {
-            return this.isNew()?'/type':('/type/' + this.get('type_id'));
+            return restUri(this.isNew()?'/type':('/type/' + this.get('type_id')));
         }
     }
     );
@@ -44,7 +51,7 @@ var Type = RestModel.extend(
 var TypeCollection = RestCollection.extend(
     {
         model: Type,
-        url: '/type'
+        url: restUri('/type')
     }
     );
 
@@ -69,7 +76,7 @@ var Item = RestModel.extend(
                 return errors;
         },
         url: function() {
-            return this.isNew()?'/item':('/item/' + this.get('item_id'));
+            return restUri(this.isNew()?'/item':('/item/' + this.get('item_id')));
         }
     }
     );
@@ -107,14 +114,14 @@ var ItemImageCollection = RestCollection.extend(
             this.item = options.item;
         },
         model: Attachment,
-        url: function() { return '/item/' + this.item.get('item_id') + '/image'; }
+        url: function() { return restUri('/item/' + this.item.get('item_id') + '/image'); }
     }
     );
 
 var ItemCollection = RestCollection.extend(
     {
         model: Item,
-        url: '/item'
+        url: restUri('/item')
     }
     );
 
@@ -133,7 +140,7 @@ var Maker = RestModel.extend(
                 return errors;
         },
         url: function() {
-            return this.isNew()?'/maker':('/maker/' + this.get('maker_id'));
+            return restUri(this.isNew()?'/maker':('/maker/' + this.get('maker_id')));
         }
     }
     );
@@ -141,7 +148,7 @@ var Maker = RestModel.extend(
 var MakerCollection = RestCollection.extend(
     {
         model: Maker,
-        url: '/maker'
+        url: restUri('/maker')
     }
     );
 
@@ -152,7 +159,7 @@ var MakerItems = RestCollection.extend(
             RestCollection.prototype.initialize.apply(this, arguments);
             this._maker = options.maker;
         },
-        url: function() { return '/maker/' + this._maker.get('maker_id') + '/item'; }
+        url: function() { return restUri('/maker/' + this._maker.get('maker_id') + '/item'); }
     }
     );
 
@@ -163,7 +170,7 @@ var TypeItems = RestCollection.extend(
             RestCollection.prototype.initialize.apply(this, arguments);
             this._type = options.type;
         },
-        url: function() { return '/type/' + this._type.get('type_id') + '/item'; }
+        url: function() { return restUri('/type/' + this._type.get('type_id') + '/item'); }
     }
     );
 
@@ -175,7 +182,7 @@ var Options = RestModel.extend(
         defaults: {
             collection_name: 'New Collection'
         },
-        url: '/option',
+        url: restUri('/option'),
         isNew: function() { return false; }
     }
     );

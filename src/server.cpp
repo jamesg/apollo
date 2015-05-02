@@ -76,7 +76,12 @@ apollo::server::server(
     install_static_file("/ShareTechMono-Regular.ttf");
     install_static_file("/ShareTech-Regular.ttf");
 
-    rest::install(*m_connection, m_http_server);
+    boost::shared_ptr<atlas::http::router> rest_router(rest::router(*m_connection));
+    m_http_server.router().install(
+            atlas::http::matcher("/api(.*)"),
+            boost::bind(&atlas::http::router::serve, rest_router, _1, _2, _3, _4)
+            );
+    //rest::install(*m_connection, m_http_server);
     m_http_server.router().install(
         atlas::http::matcher("/item/([0-9]+)/image", "POST"),
         [this](

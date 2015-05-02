@@ -1,6 +1,10 @@
 #ifndef APOLLO_REST_HPP
 #define APOLLO_REST_HPP
 
+#include <boost/shared_ptr.hpp>
+
+#include "atlas/http/server/router.hpp"
+
 namespace hades
 {
     class connection;
@@ -19,7 +23,7 @@ namespace apollo
         /*!
          * \brief Install Apollo REST URIs to a HTTP server.
          */
-        void install(hades::connection&, atlas::http::server&);
+        boost::shared_ptr<atlas::http::router> router(hades::connection&);
     }
 }
 

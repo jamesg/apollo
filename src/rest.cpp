@@ -17,10 +17,11 @@ namespace
     constexpr char item_count[] = "item_count";
 }
 
-void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
+boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& conn)
 {
+    boost::shared_ptr<atlas::http::router> router(new atlas::http::router);
     // Options.
-    server.router().install<std::string>(
+    router->install<std::string>(
         atlas::http::matcher("/option/([^/]+)", "DELETE"),
         [&conn](const std::string option_name) {
             if(
@@ -35,7 +36,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 return atlas::http::json_error_response("deleting option");
         }
         );
-    server.router().install<std::string>(
+    router->install<std::string>(
         atlas::http::matcher("/option/([^/]+)", "GET"),
         [&conn](const std::string option_name) {
             return atlas::http::json_response(
@@ -46,7 +47,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install<>(
+    router->install<>(
         atlas::http::matcher("/option", "GET"),
         [&conn]() {
             styx::list l = hades::get_collection<option>(conn);
@@ -60,7 +61,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
             return atlas::http::json_response(out);
         }
         );
-    server.router().install_json<>(
+    router->install_json<>(
         atlas::http::matcher("/option", "PUT"),
         [&conn](const styx::element e) {
             styx::object o(e);
@@ -81,7 +82,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         }
         );
     // Type collection.
-    server.router().install<>(
+    router->install<>(
         atlas::http::matcher("/type", "GET"),
         [&conn]() {
             return atlas::http::json_response(
@@ -95,7 +96,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install_json<>(
+    router->install_json<>(
         atlas::http::matcher("/type", "POST"),
         [&conn](const styx::element type_e) {
             type t(type_e);
@@ -118,7 +119,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Type detail.
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/type/([0-9]+)", "DELETE"),
         [&conn](const int type_id) {
             if(type_id == 0)
@@ -137,7 +138,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 return atlas::http::json_error_response("deleting type");
         }
         );
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/type/([0-9]+)", "GET"),
         [&conn](const int type_id) {
             return atlas::http::json_response(
@@ -145,7 +146,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install_json<int>(
+    router->install_json<int>(
         atlas::http::matcher("/type/([0-9]+)", "PUT"),
         [&conn](const styx::element e, const int type_id) {
             type t(e);
@@ -155,7 +156,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Type item collection.
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/type/([0-9]+)/item", "GET"),
         [&conn](const int type_id) {
             return atlas::http::json_response(
@@ -171,7 +172,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Item collection.
-    server.router().install<>(
+    router->install<>(
         atlas::http::matcher("/item", "GET"),
         [&conn]() {
             return atlas::http::json_response(
@@ -182,7 +183,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install_json<>(
+    router->install_json<>(
         atlas::http::matcher("/item", "POST"),
         [&conn](const styx::element item_e) {
             item i(item_e);
@@ -192,7 +193,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Item detail.
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/item/([0-9]+)", "DELETE"),
         [&conn](const int item_id) {
             item i;
@@ -203,7 +204,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 return atlas::http::json_error_response("deleting item");
         }
         );
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/item/([0-9]+)", "GET"),
         [&conn](const int item_id) {
             styx::list items = hades::outer_join<item, maker>(
@@ -221,7 +222,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
             return atlas::http::json_response(items.at(0));
         }
         );
-    server.router().install_json<int>(
+    router->install_json<int>(
         atlas::http::matcher("/item/([0-9]+)", "PUT"),
         [&conn](const styx::element e, const int item_id) {
             item i(e);
@@ -233,7 +234,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Item images.
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/item/([0-9]+)/image", "GET"),
         [&conn](const int item_id) {
             return atlas::http::json_response(
@@ -250,7 +251,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Maker collection.
-    server.router().install<>(
+    router->install<>(
         atlas::http::matcher("/maker", "GET"),
         [&conn]() {
             return atlas::http::json_response(
@@ -264,7 +265,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install_json<>(
+    router->install_json<>(
         atlas::http::matcher("/maker", "POST"),
         [&conn](const styx::element maker_e) {
             maker m(maker_e);
@@ -288,7 +289,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Maker detail.
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/maker/([0-9]+)", "DELETE"),
         [&conn](const int maker_id) {
             if(maker_id == 0)
@@ -307,7 +308,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 return atlas::http::json_error_response("deleting maker");
         }
         );
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/maker/([0-9]+)", "GET"),
         [&conn](const int maker_id) {
             return atlas::http::json_response(
@@ -315,7 +316,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install_json<int>(
+    router->install_json<int>(
         atlas::http::matcher("/maker/([0-9]+)", "PUT"),
         [&conn](const styx::element maker_e, const int maker_id) {
             maker m(maker_e);
@@ -323,7 +324,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
             return atlas::http::json_response(m);
         }
         );
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/maker/([0-9]+)/item", "GET"),
         [&conn](const int maker_id) {
             return atlas::http::json_response(
@@ -340,7 +341,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Year.
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/year/([0-9]+)/item", "GET"),
         [&conn](const int year) {
             return atlas::http::json_response(
@@ -353,7 +354,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
         );
 
     // Attachments.
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/attachment/([0-9]+)/info", "GET"),
         [&conn](const int attachment_id) {
             return atlas::http::json_response(
@@ -364,7 +365,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install_json<int>(
+    router->install_json<int>(
         atlas::http::matcher("/attachment/([0-9]+)/info", "PUT"),
         [&conn](styx::element a_e, const int attachment_id) {
             attachment_info a(a_e);
@@ -377,7 +378,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 );
         }
         );
-    server.router().install<int>(
+    router->install<int>(
         atlas::http::matcher("/attachment/([0-9]+)/info", "DELETE"),
         [&conn](const int attachment_id) {
             attachment_info a;
@@ -388,5 +389,7 @@ void apollo::rest::install(hades::connection& conn, atlas::http::server& server)
                 return atlas::http::json_error_response("deleting attachment");
         }
         );
+
+    return router;
 }
 
