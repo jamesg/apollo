@@ -28,7 +28,6 @@ namespace apollo
         {
             std::string address;
             std::string db_file;
-            std::string html_root;
             std::string port;
             options() :
                 address("0.0.0.0")

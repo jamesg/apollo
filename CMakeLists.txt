@@ -30,9 +30,14 @@ add_subdirectory(atlas)
 # Apollo components
 add_subdirectory(src)
 
+# Web components
+add_subdirectory(static)
+
 add_executable(apollo src/main/apollo.cpp)
+add_dependencies(apollo apollo-static)
 target_link_libraries(
     apollo
     apollo-server-lib
+    ${CMAKE_CURRENT_BINARY_DIR}/static/static.a
     )
 
