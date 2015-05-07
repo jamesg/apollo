@@ -38,6 +38,5 @@ add_dependencies(apollo apollo-static)
 target_link_libraries(
     apollo
     apollo-server-lib
-    ${CMAKE_CURRENT_BINARY_DIR}/static/static.a
     )
 

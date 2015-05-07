@@ -5,7 +5,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "atlas/http/server/mimetypes.hpp"
 #include "atlas/http/server/server.hpp"
 
 namespace hades
@@ -49,9 +48,7 @@ namespace apollo
         // This is a scoped_ptr rather than a plain member to allow deferred
         // initialisation.
         boost::scoped_ptr<hades::connection> m_connection;
-        //atlas::api::server m_auth_api_server;
         atlas::http::server m_http_server;
-        boost::scoped_ptr<atlas::http::mimetypes> m_mime_information;
     };
 }
 
