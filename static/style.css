@@ -1,11 +1,11 @@
 @font-face {
     font-family: 'ShareTechMono';
-    src: url('/ShareTechMono-Regular.ttf');
+    src: url('/atlas/ShareTechMono-Regular.ttf');
 }
 
 @font-face {
     font-family: 'ShareTech';
-    src: url('/ShareTech-Regular.ttf');
+    src: url('/atlas/ShareTech-Regular.ttf');
 }
 
 body {
