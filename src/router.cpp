@@ -46,7 +46,7 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
                 extension = url.substr(dot_pos+1);
         }
         out->install(
-                url,
+                atlas::http::matcher(url, "GET"),
                 boost::bind(
                     &atlas::http::static_text,
                     mime_information.content_type(extension),
@@ -63,7 +63,7 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
     // file extension cannot be deduced from the URL the MIME type must be
     // specified.
     out->install(
-            "/",
+            atlas::http::matcher("/", "GET"),
             boost::bind(
                 &atlas::http::static_text,
                 mime_information.content_type("html"),
