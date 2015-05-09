@@ -3,6 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "atlas/http/server/mimetypes.hpp"
 #include "atlas/http/server/router.hpp"
 
 namespace hades
@@ -11,7 +12,18 @@ namespace hades
 }
 namespace apollo
 {
-    boost::shared_ptr<atlas::http::router> router(hades::connection&);
+    class router : public atlas::http::router
+    {
+    public:
+        router(hades::connection&);
+
+    private:
+        void install_static_text(
+                const std::string& url,
+                const std::string& text
+                );
+        atlas::http::mimetypes m_mime_information;
+    };
 }
 
 #endif

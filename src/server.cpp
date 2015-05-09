@@ -34,7 +34,7 @@ apollo::server::server(
     m_connection.reset(new hades::connection(options.db_file));
     db::create(*m_connection);
 
-    boost::shared_ptr<atlas::http::router> apollo_router(router(*m_connection));
+    boost::shared_ptr<atlas::http::router> apollo_router(new router(*m_connection));
     m_http_server.router().install(
         atlas::http::matcher("(.*)", 1),
         boost::bind(&atlas::http::router::serve, apollo_router, _1, _2, _3, _4)

@@ -28,41 +28,14 @@ APOLLO_DECLARE_STATIC_STRING(application_js)
 APOLLO_DECLARE_STATIC_STRING(models_js)
 APOLLO_DECLARE_STATIC_STRING(style_css)
 
-boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
+apollo::router::router(hades::connection& conn)
 {
-    boost::shared_ptr<atlas::http::router> out(new atlas::http::router);
-
     atlas::http::mimetypes mime_information;
-
-    auto install_static_text = [&mime_information, out](
-            const std::string& url,
-            const std::string& text
-            )
-    {
-        std::string extension;
-        {
-            std::string::size_type dot_pos = url.find_last_of('.');
-            if(dot_pos != std::string::npos)
-                extension = url.substr(dot_pos+1);
-        }
-        out->install(
-                atlas::http::matcher(url, "GET"),
-                boost::bind(
-                    &atlas::http::static_text,
-                    mime_information.content_type(extension),
-                    text,
-                    _1,
-                    _2,
-                    _3,
-                    _4
-                    )
-                );
-    };
 
     // Special case; index.html should be served on requests to /, but as the
     // file extension cannot be deduced from the URL the MIME type must be
     // specified.
-    out->install(
+    install(
             atlas::http::matcher("/", "GET"),
             boost::bind(
                 &atlas::http::static_text,
@@ -88,12 +61,12 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
     install_static_text("/style.css", APOLLO_STATIC_STD_STRING(style_css));
 
     boost::shared_ptr<atlas::http::router> rest_router(rest::router(conn));
-    out->install(
+    install(
             atlas::http::matcher("/api(.*)"),
             boost::bind(&atlas::http::router::serve, rest_router, _1, _2, _3, _4)
             );
 
-    out->install(
+    install(
         atlas::http::matcher("/item/([0-9]+)/image", "POST"),
         [&conn](
             mg_connection *mg_conn,
@@ -106,7 +79,7 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
             upload_item_image(conn, mg_conn, item_id, success, failure);
         }
         );
-    out->install(
+    install(
         atlas::http::matcher("/attachment", "POST"),
         [&conn](
             mg_connection *mg_conn,
@@ -135,9 +108,9 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
                 );
         }
         );
-    out->install(
+    install(
         atlas::http::matcher("/attachment/([0-9]+)", "GET"),
-        [&conn, &mime_information](
+        [this, &conn](
             mg_connection *mg_conn,
             boost::smatch args,
             atlas::http::uri_callback_type success,
@@ -147,7 +120,7 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
             const int attachment_id = boost::lexical_cast<int>(args[1]);
                 //catch(const boost::bad_lexical_cast& e)
             return download_file(
-                mime_information,
+                m_mime_information,
                 conn,
                 mg_conn,
                 attachment_id,
@@ -156,9 +129,9 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
                 );
         }
         );
-    out->install(
+    install(
         atlas::http::matcher("/attachment/([0-9]+)/image/([0-9]+)x([0-9]+)", "GET"),
-        [&conn, &mime_information](
+        [this, &conn](
             mg_connection *mg_conn,
             boost::smatch args,
             atlas::http::uri_callback_type success,
@@ -169,7 +142,7 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
             const int width = boost::lexical_cast<int>(args[2]);
             const int height = boost::lexical_cast<int>(args[3]);
             return image_scaled(
-                mime_information,
+                m_mime_information,
                 conn,
                 mg_conn,
                 attachment_id,
@@ -180,7 +153,31 @@ boost::shared_ptr<atlas::http::router> apollo::router(hades::connection& conn)
                 );
         }
         );
+}
 
-    return out;
+void apollo::router::install_static_text(
+        const std::string& url,
+        const std::string& text
+        )
+{
+    std::string extension;
+    {
+        std::string::size_type dot_pos = url.find_last_of('.');
+        if(dot_pos != std::string::npos)
+            extension = url.substr(dot_pos+1);
+    }
+    auto mimetype = m_mime_information.content_type(extension);
+    install(
+            atlas::http::matcher(url, "GET"),
+            boost::bind(
+                &atlas::http::static_text,
+                mimetype,
+                text,
+                _1,
+                _2,
+                _3,
+                _4
+                )
+            );
 }
 
