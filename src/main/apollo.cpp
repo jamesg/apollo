@@ -5,7 +5,7 @@
 #include "atlas/log/log.hpp"
 #include "commandline/commandline.hpp"
 
-#include "server.hpp"
+#include "apollo/server.hpp"
 
 int apollo::main::run(int argc, const char **argv)
 {

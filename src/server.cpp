@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "apollo/server.hpp"
 
 #include "hades/connection.hpp"
 #include "hades/mkstr.hpp"
@@ -10,8 +10,8 @@
 #include "atlas/jsonrpc/uri.hpp"
 #include "atlas/log/log.hpp"
 
-#include "db.hpp"
-#include "router.hpp"
+#include "apollo/db.hpp"
+#include "apollo/router.hpp"
 
 apollo::server::server(
         const server::options& options,

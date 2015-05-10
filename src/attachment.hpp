@@ -7,7 +7,7 @@
 
 #include "atlas/http/server/uri_type.hpp"
 
-#include "db.hpp"
+#include "apollo/db.hpp"
 
 namespace atlas
 {

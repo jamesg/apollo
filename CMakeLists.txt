@@ -10,6 +10,7 @@ find_package(Boost COMPONENTS date_time filesystem random regex system thread)
 find_package(ImageMagick COMPONENTS Magick++)
 
 include_directories("src")
+include_directories("include")
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${ImageMagick_INCLUDE_DIRS})
 include_directories(${CURL_INCLUDE_DIRS})
@@ -23,7 +24,7 @@ add_subdirectory(src)
 add_subdirectory(static)
 
 add_executable(apollo src/main/apollo.cpp)
-add_dependencies(apollo apollo-static)
+add_dependencies(apollo-server-lib apollo-static)
 target_link_libraries(
     apollo
     apollo-server-lib

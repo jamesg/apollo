@@ -11,7 +11,7 @@
 #include "hades/step.hpp"
 #include "styx/serialise_json.hpp"
 
-#include "db.hpp"
+#include "apollo/db.hpp"
 
 void apollo::upload_file(
         hades::connection& conn,

@@ -8,7 +8,7 @@
 #include "hades/get_by_id.hpp"
 
 #include "attachment.hpp"
-#include "db.hpp"
+#include "apollo/db.hpp"
 
 void apollo::image_scaled(
         const atlas::http::mimetypes& mimetypes,
