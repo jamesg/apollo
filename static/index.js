@@ -88,7 +88,7 @@ var TypePage = PageView.extend(
                 }),
                 emptyView: StaticView.extend({
                     tagName: 'li',
-                    template: 'This maker does not have any items.'
+                    template: 'There are no items of this type.'
                 })
             })).render();
         },

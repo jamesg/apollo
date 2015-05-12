@@ -7,7 +7,7 @@
  * Get the URI for a REST API handler.
  */
 var restUri = function(fragment) {
-    return '/api' + fragment;
+    return 'api' + fragment;
 };
 
 var RestCollection = Backbone.Collection.extend(
@@ -91,18 +91,18 @@ var Attachment = RestModel.extend(
         },
         url: function() {
             if(this.isNew())
-                return '/attachment';
+                return 'attachment';
             else
-                return '/attachment/' + this.get('attachment_id') + '/info';
+                return 'attachment/' + this.get('attachment_id') + '/info';
         },
         urlFullsize: function() {
-            return '/attachment/' + this.get('attachment_id') + '/image'
+            return 'attachment/' + this.get('attachment_id') + '/image'
         },
         urlThumb: function() {
-            return '/attachment/' + this.get('attachment_id') + '/image/150x150'
+            return 'attachment/' + this.get('attachment_id') + '/image/150x150'
         },
         urlMedium: function() {
-            return '/attachment/' + this.get('attachment_id') + '/image/400x300'
+            return 'attachment/' + this.get('attachment_id') + '/image/400x300'
         }
     }
     );
