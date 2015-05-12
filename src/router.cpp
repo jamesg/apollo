@@ -30,28 +30,11 @@ APOLLO_DECLARE_STATIC_STRING(style_css)
 
 apollo::router::router(hades::connection& conn)
 {
-    atlas::http::mimetypes mime_information;
-
-    // Special case; index.html should be served on requests to /, but as the
-    // file extension cannot be deduced from the URL the MIME type must be
-    // specified.
-    install(
-            atlas::http::matcher("/", "GET"),
-            boost::bind(
-                &atlas::http::static_text,
-                mime_information.content_type("html"),
-                APOLLO_STATIC_STD_STRING(index_html),
-                _1,
-                _2,
-                _3,
-                _4
-                )
-            );
-
     //
     // Install static files.
     //
 
+    install_static_text("/", "html", APOLLO_STATIC_STD_STRING(index_html));
     install_static_text("/index.html", APOLLO_STATIC_STD_STRING(index_html));
     install_static_text("/manage.html", APOLLO_STATIC_STD_STRING(manage_html));
     install_static_text("/index.js", APOLLO_STATIC_STD_STRING(index_js));
@@ -120,7 +103,7 @@ apollo::router::router(hades::connection& conn)
             const int attachment_id = boost::lexical_cast<int>(args[1]);
                 //catch(const boost::bad_lexical_cast& e)
             return download_file(
-                m_mime_information,
+                mime_information(),
                 conn,
                 mg_conn,
                 attachment_id,
@@ -142,7 +125,7 @@ apollo::router::router(hades::connection& conn)
             const int width = boost::lexical_cast<int>(args[2]);
             const int height = boost::lexical_cast<int>(args[3]);
             return image_scaled(
-                m_mime_information,
+                mime_information(),
                 conn,
                 mg_conn,
                 attachment_id,
@@ -153,31 +136,5 @@ apollo::router::router(hades::connection& conn)
                 );
         }
         );
-}
-
-void apollo::router::install_static_text(
-        const std::string& url,
-        const std::string& text
-        )
-{
-    std::string extension;
-    {
-        std::string::size_type dot_pos = url.find_last_of('.');
-        if(dot_pos != std::string::npos)
-            extension = url.substr(dot_pos+1);
-    }
-    auto mimetype = m_mime_information.content_type(extension);
-    install(
-            atlas::http::matcher(url, "GET"),
-            boost::bind(
-                &atlas::http::static_text,
-                mimetype,
-                text,
-                _1,
-                _2,
-                _3,
-                _4
-                )
-            );
 }
 
