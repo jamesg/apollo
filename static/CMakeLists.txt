@@ -1,6 +1,7 @@
 atlas_add_web_library(
     PREFIX apollo
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/static.a
+    TARGET apollo-static
     SOURCES
         index.html
         index.js
@@ -10,6 +11,4 @@ atlas_add_web_library(
         models.js
         style.css
         )
-
-add_custom_target(apollo-static ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/static.a)
 

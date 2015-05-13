@@ -1,33 +1,9 @@
-// REST responses consist of the actual response as the 'data' key inside a
-// JSON object.  This allows the protocol to be extended more easily at a later
-// date if required.  In the case of array responses, returning a raw array is
-// also a potential security risk.
-
 /*
  * Get the URI for a REST API handler.
  */
 var restUri = function(fragment) {
     return 'api' + fragment;
 };
-
-var RestCollection = Backbone.Collection.extend(
-        {
-            parse: function(response) {
-                return response.data;
-            }
-        }
-        );
-
-var RestModel = Backbone.Model.extend(
-        {
-            parse: function(response) {
-                if(_.has(response, 'data'))
-                    return response.data;
-                else
-                    return response;
-            }
-        }
-        );
 
 var Type = RestModel.extend(
     {
