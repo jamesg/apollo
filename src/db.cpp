@@ -20,24 +20,24 @@ const char apollo::attr::attachment_id[] = "attachment_id";
 const char apollo::attr::attachment_orig_filename[] = "attachment_orig_filename";
 const char apollo::attr::attachment_title[] = "attachment_title";
 const char apollo::attr::attachment_upload_date[] = "attachment_upload_date";
-const char apollo::relvar::option[] = "option";
-const char apollo::relvar::type[] = "type";
-const char apollo::relvar::item[] = "item";
-const char apollo::relvar::maker[] = "maker";
-const char apollo::relvar::attachment[] = "attachment";
-const char apollo::relvar::image_of[] = "image_of";
+const char apollo::relvar::option[] = "apollo_option";
+const char apollo::relvar::type[] = "apollo_type";
+const char apollo::relvar::item[] = "apollo_item";
+const char apollo::relvar::maker[] = "apollo_maker";
+const char apollo::relvar::attachment[] = "apollo_attachment";
+const char apollo::relvar::image_of[] = "apollo_image_of";
 
 void apollo::db::create(hades::connection& conn)
 {
     hades::devoid(
-        "CREATE TABLE IF NOT EXISTS option ( "
+        "CREATE TABLE IF NOT EXISTS apollo_option ( "
         " option_name VARCHAR PRIMARY KEY, "
         " option_value VARCHAR "
         " ) ",
         conn
         );
     hades::devoid(
-        "CREATE TABLE IF NOT EXISTS type ( "
+        "CREATE TABLE IF NOT EXISTS apollo_type ( "
         " type_id INTEGER PRIMARY KEY AUTOINCREMENT, "
         " type_name VARCHAR UNIQUE NOT NULL "
         " ) ",
@@ -45,11 +45,11 @@ void apollo::db::create(hades::connection& conn)
         );
     if(!hades::exists<type>(conn, hades::where("type_id = 0")))
         hades::devoid(
-            "INSERT INTO type(type_id, type_name) VALUES(0, 'Unknown')",
+            "INSERT INTO apollo_type(type_id, type_name) VALUES(0, 'Unknown')",
             conn
             );
     hades::devoid(
-        "CREATE TABLE IF NOT EXISTS maker ( "
+        "CREATE TABLE IF NOT EXISTS apollo_maker ( "
         " maker_id INTEGER PRIMARY KEY AUTOINCREMENT, "
         " maker_name VARCHAR "
         " ) ",
@@ -57,11 +57,11 @@ void apollo::db::create(hades::connection& conn)
         );
     if(!hades::exists<maker>(conn, hades::where("maker_id = 0")))
         hades::devoid(
-            "INSERT INTO maker(maker_id, maker_name) VALUES(0, 'Unknown')",
+            "INSERT INTO apollo_maker(maker_id, maker_name) VALUES(0, 'Unknown')",
             conn
             );
     hades::devoid(
-        "CREATE TABLE IF NOT EXISTS item ( "
+        "CREATE TABLE IF NOT EXISTS apollo_item ( "
         " item_id INTEGER PRIMARY KEY AUTOINCREMENT, "
         " type_id INTEGER REFERENCES type(type_id), "
         " maker_id INTEGER REFERENCES maker(maker_id), "
@@ -74,7 +74,7 @@ void apollo::db::create(hades::connection& conn)
         conn
         );
     hades::devoid(
-        "CREATE TABLE IF NOT EXISTS attachment ( "
+        "CREATE TABLE IF NOT EXISTS apollo_attachment ( "
         " attachment_id INTEGER PRIMARY KEY AUTOINCREMENT, "
         " attachment_orig_filename VARCHAR, "
         " attachment_title VARCHAR, "
@@ -84,10 +84,10 @@ void apollo::db::create(hades::connection& conn)
         conn
         );
     hades::devoid(
-        "CREATE TABLE IF NOT EXISTS image_of ( "
-        " attachment_id INTEGER REFERENCES attachment(attachment_id) "
+        "CREATE TABLE IF NOT EXISTS apollo_image_of ( "
+        " attachment_id INTEGER REFERENCES apollo_attachment(attachment_id) "
         "  ON DELETE CASCADE, "
-        " item_id INTEGER REFERENCES item(item_id) "
+        " item_id INTEGER REFERENCES apollo_item(item_id) "
         "  ON DELETE CASCADE "
         " ) ",
         conn

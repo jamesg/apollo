@@ -26,7 +26,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
         [&conn](const std::string option_name) {
             if(
                 hades::devoid(
-                    "DELETE FROM option WHERE option_name = ?",
+                    "DELETE FROM apollo_option WHERE option_name = ?",
                     hades::row<std::string>(option_name),
                     conn
                     ) == 1
@@ -88,10 +88,10 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(
                 hades::custom_select<type, attr::type_id, attr::type_name, item_count>(
                     conn,
-                    "SELECT type.type_id, type.type_name, COUNT(item.item_id) "
-                    "FROM type LEFT OUTER JOIN item "
-                    "ON type.type_id = item.type_id "
-                    "GROUP BY type.type_id "
+                    "SELECT apollo_type.type_id, apollo_type.type_name, COUNT(apollo_item.item_id) "
+                    "FROM apollo_type LEFT OUTER JOIN apollo_item "
+                    "ON apollo_type.type_id = apollo_item.type_id "
+                    "GROUP BY apollo_type.type_id "
                     )
                 );
         }
@@ -126,7 +126,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 return atlas::http::json_error_response("cannot delete the 'unknown' type");
 
             hades::devoid(
-                "UPDATE item SET type_id = 0 WHERE type_id = ?",
+                "UPDATE apollo_item SET type_id = 0 WHERE type_id = ?",
                 hades::row<int>(type_id),
                 conn
                 );
@@ -163,7 +163,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 hades::join<type, item>(
                     conn,
                     hades::where(
-                        "type.type_id = item.type_id AND type.type_id = ?",
+                        "apollo_type.type_id = apollo_item.type_id AND apollo_type.type_id = ?",
                         hades::row<int>(type_id)
                         )
                     )
@@ -178,7 +178,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(
                 hades::join<item, maker>(
                     conn,
-                    hades::where("item.maker_id = maker.maker_id")
+                    hades::where("apollo_item.maker_id = apollo_maker.maker_id")
                     )
                 );
         }
@@ -210,8 +210,8 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             styx::list items = hades::outer_join<item, maker>(
                 conn,
                 hades::where(
-                    "item.maker_id = maker.maker_id and "
-                    "item.item_id = ?",
+                    "apollo_item.maker_id = apollo_maker.maker_id and "
+                    "apollo_item.item_id = ?",
                     hades::row<int>(item_id)
                     )
                 );
@@ -241,8 +241,8 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 hades::join<attachment_info, image_of>(
                     conn,
                     hades::where(
-                        "attachment.attachment_id = image_of.attachment_id AND "
-                        "image_of.item_id = ? ",
+                        "apollo_attachment.attachment_id = apollo_image_of.attachment_id AND "
+                        "apollo_image_of.item_id = ? ",
                         hades::row<int>(item_id)
                         )
                     )
@@ -257,10 +257,10 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(
                 hades::custom_select<maker, attr::maker_id, attr::maker_name, item_count>(
                     conn,
-                    "SELECT maker.maker_id, maker.maker_name, COUNT(item.item_id) "
-                    "FROM maker LEFT OUTER JOIN item "
-                    "ON maker.maker_id = item.maker_id "
-                    "GROUP BY maker.maker_id "
+                    "SELECT apollo_maker.maker_id, apollo_maker.maker_name, COUNT(apollo_item.item_id) "
+                    "FROM apollo_maker LEFT OUTER JOIN apollo_item "
+                    "ON apollo_maker.maker_id = apollo_item.maker_id "
+                    "GROUP BY apollo_maker.maker_id "
                     )
                 );
         }
@@ -296,7 +296,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 return atlas::http::json_error_response("cannot delete the 'unknown' maker");
 
             hades::devoid(
-                "UPDATE item SET maker_id = 0 WHERE maker_id = ?",
+                "UPDATE apollo_item SET maker_id = 0 WHERE maker_id = ?",
                 hades::row<int>(maker_id),
                 conn
                 );
@@ -331,8 +331,8 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 hades::outer_join<item, maker>(
                     conn,
                     hades::where(
-                        "item.maker_id = maker.maker_id and "
-                        "item.maker_id = ?",
+                        "apollo_item.maker_id = apollo_maker.maker_id and "
+                        "apollo_item.maker_id = ?",
                         hades::row<int>(maker_id)
                         )
                     )
@@ -347,7 +347,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(
                 hades::get_collection<item>(
                     conn,
-                    hades::where("item.year = ?", hades::row<int>(year))
+                    hades::where("apollo_item.year = ?", hades::row<int>(year))
                     )
                 );
         }
