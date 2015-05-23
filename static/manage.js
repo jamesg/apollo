@@ -130,7 +130,7 @@ var ManageHomePage = PageView.extend(
         showOptions: function() {
             gApplication.modal(
                 new Modal({
-                    buttons: { save: true, cancel: true },
+                    buttons: [ StandardButton.save(), StandardButton.cancel() ],
                     view: OptionsForm,
                     model: gApplication.options()
                 })
@@ -162,7 +162,7 @@ var ManageHomePage = PageView.extend(
                 'click',
                 (function() {
                     var m = new Modal({
-                        buttons: { cancel: true, create: true },
+                        buttons: [ StandardButton.cancel(), StandardButton.create() ],
                         model: new Maker,
                         view: MakerForm
                     });
@@ -175,7 +175,7 @@ var ManageHomePage = PageView.extend(
                 (function() {
                     var m = new Modal(
                         {
-                            buttons: { cancel: true, create: true },
+                            buttons: [ StandardButton.cancel(), StandardButton.create() ],
                             model: new Type,
                             view: TypeForm
                         }
@@ -195,7 +195,7 @@ var ManageHomePage = PageView.extend(
                     events: { 'click': 'gotoMaker' },
                     gotoMaker: function() {
                         var m = new Modal({
-                                buttons: { cancel: true, destroy: true, save: true },
+                                buttons: [ StandardButton.cancel(), StandardButton.destroy(), StandardButton.save() ],
                                 model: this.model,
                                 view: MakerForm
                         });
@@ -214,7 +214,7 @@ var ManageHomePage = PageView.extend(
                     gotoType: function() {
                         var m = new Modal(
                             {
-                                buttons: { cancel: true, destroy: true, save: true },
+                                buttons: [ StandardButton.cancel(), StandardButton.destroy(), StandardButton.save() ],
                                 model: this.model,
                                 view: TypeForm
                             }

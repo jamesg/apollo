@@ -61,9 +61,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(out);
         }
         );
-    router->install_json<>(
+    router->install_json<styx::element>(
         atlas::http::matcher("/option", "PUT"),
-        [&conn](const styx::element e) {
+        [&conn](const styx::element& e) {
             styx::object o(e);
             for(const std::pair<std::string, styx::element> p : o)
             {
@@ -96,9 +96,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 );
         }
         );
-    router->install_json<>(
+    router->install_json<styx::element>(
         atlas::http::matcher("/type", "POST"),
-        [&conn](const styx::element type_e) {
+        [&conn](const styx::element& type_e) {
             type t(type_e);
             if(
                 hades::exists<type>(
@@ -146,9 +146,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 );
         }
         );
-    router->install_json<int>(
+    router->install_json<styx::element, int>(
         atlas::http::matcher("/type/([0-9]+)", "PUT"),
-        [&conn](const styx::element e, const int type_id) {
+        [&conn](const styx::element& e, const int type_id) {
             type t(e);
             t.update(conn);
             return atlas::http::json_response(t);
@@ -183,9 +183,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 );
         }
         );
-    router->install_json<>(
+    router->install_json<styx::element>(
         atlas::http::matcher("/item", "POST"),
-        [&conn](const styx::element item_e) {
+        [&conn](const styx::element& item_e) {
             item i(item_e);
             i.insert(conn);
             return atlas::http::json_response(i);
@@ -222,9 +222,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(items.at(0));
         }
         );
-    router->install_json<int>(
+    router->install_json<styx::element, int>(
         atlas::http::matcher("/item/([0-9]+)", "PUT"),
-        [&conn](const styx::element e, const int item_id) {
+        [&conn](const styx::element& e, const int item_id) {
             item i(e);
             if(i.update(conn))
                 return atlas::http::json_response(i);
@@ -265,9 +265,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 );
         }
         );
-    router->install_json<>(
+    router->install_json<styx::element>(
         atlas::http::matcher("/maker", "POST"),
-        [&conn](const styx::element maker_e) {
+        [&conn](const styx::element& maker_e) {
             maker m(maker_e);
             if(
                 hades::exists<maker>(
@@ -316,9 +316,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 );
         }
         );
-    router->install_json<int>(
+    router->install_json<styx::element, int>(
         atlas::http::matcher("/maker/([0-9]+)", "PUT"),
-        [&conn](const styx::element maker_e, const int maker_id) {
+        [&conn](const styx::element& maker_e, const int maker_id) {
             maker m(maker_e);
             m.update(conn);
             return atlas::http::json_response(m);
@@ -365,9 +365,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 );
         }
         );
-    router->install_json<int>(
+    router->install_json<styx::element, int>(
         atlas::http::matcher("/attachment/([0-9]+)/info", "PUT"),
-        [&conn](styx::element a_e, const int attachment_id) {
+        [&conn](const styx::element& a_e, const int attachment_id) {
             attachment_info a(a_e);
             a.update(conn);
             return atlas::http::json_response(

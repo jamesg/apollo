@@ -42,7 +42,7 @@ var MakerPage = PageView.extend(
         showCreateDialog: function() {
             var newItem = new Item({ maker_id: this.model.get('maker_id') });
             var m = new Modal({
-                buttons: { cancel: true, create: true },
+                buttons: [ StandardButton.cancel(), StandardButton.create() ],
                 model: newItem,
                 view: ItemForm
             });
@@ -95,7 +95,7 @@ var TypePage = PageView.extend(
         showCreateDialog: function() {
             var newItem = new Item({ type_id: this.model.get('type_id') });
             var m = new Modal({
-                buttons: { cancel: true, create: true },
+                buttons: [ StandardButton.cancel(), StandardButton.create() ],
                 model: newItem,
                 view: ItemForm
             });
@@ -297,7 +297,7 @@ var ItemPage = PageView.extend(
                         //this.model.fetch();
                         var attachment = this.model;
                         var m = new Modal({
-                            buttons: { close: true, destroy: true, save: true },
+                            buttons: [ StandardButton.close(), StandardButton.destroy(), StandardButton.save() ],
                             model: this.model,
                             view: ItemImageForm
                         });
@@ -314,7 +314,7 @@ var ItemPage = PageView.extend(
         },
         edit: function() {
             var m = new Modal({
-                buttons: { cancel: true, save: true },
+                buttons: [ StandardButton.cancel(), StandardButton.save() ],
                 model: this.model,
                 view: ItemForm
             });
@@ -327,7 +327,7 @@ var ItemPage = PageView.extend(
         },
         addImage: function() {
             var m = new Modal({
-                buttons: { cancel: true, save: true },
+                buttons: [ StandardButton.cancel(), StandardButton.save() ],
                 model: this.model,
                 view: ImageUploadForm
             });
@@ -360,7 +360,7 @@ var TypeCollectionPage = PageView.extend(
         pageTitle: 'Types',
         initialize: function() {
             PageView.prototype.initialize.apply(this, arguments);
-            this.render();
+            PageView.prototype.render.apply(this, arguments);
             var model = new TypeCollection;
             model.fetch();
             (new CollectionView({
@@ -378,6 +378,7 @@ var TypeCollectionPage = PageView.extend(
                 })
             })).render();
         },
+        render: function() {},
         template: $('#typecollectionpage-template').html()
     }
     );
@@ -386,7 +387,9 @@ var TimelinePage = PageView.extend(
     {
         pageTitle: 'Timeline',
         initialize: function() {
-            this.model = new ItemCollection(
+            PageView.prototype.initialize.apply(this, arguments);
+            PageView.prototype.render.apply(this, arguments);
+            var items = new ItemCollection(
                 [],
                 {
                     comparator: function(x) {
@@ -394,16 +397,10 @@ var TimelinePage = PageView.extend(
                     }
                 }
                 );
-            this.model.fetch();
-
-            this.render();
-        },
-        template: $('#timelinepage-template').html(),
-        render: function() {
-            this.$el.html(_.template(this.template)(this.templateParams()));
+            items.fetch();
             (new CollectionView({
                 el: this.$('ul[name=items]'),
-                model: this.model,
+                model: items,
                 view: StaticView.extend({
                     tagName: 'li',
                     template: '<%-item_year%>: <%-item_name%> (<%-maker_name%>)',
@@ -415,7 +412,9 @@ var TimelinePage = PageView.extend(
                     }
                 })
             })).render();
-        }
+        },
+        template: $('#timelinepage-template').html(),
+        render: function() {}
     }
     );
 
@@ -424,7 +423,7 @@ var MakerCollectionPage = PageView.extend(
         pageTitle: 'Makers',
         initialize: function() {
             PageView.prototype.initialize.apply(this, arguments);
-            this.render();
+            PageView.prototype.render.apply(this, arguments);
             var model = new MakerCollection;
             model.fetch();
             (new CollectionView({
@@ -442,6 +441,7 @@ var MakerCollectionPage = PageView.extend(
                 })
             })).render();
         },
+        render: function() {},
         template: $('#makercollectionpage-template').html()
     }
     );
@@ -527,9 +527,11 @@ var HomePage = PageView.extend(
                 );
             typesList.render();
         },
+        render: function() {
+        },
         showCreateDialog: function() {
             var m = new Modal({
-                buttons: { cancel: true, create: true },
+                buttons: [ StandardButton.cancel(), StandardButton.create() ],
                 model: new Item,
                 view: ItemForm
             });
