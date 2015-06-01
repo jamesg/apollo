@@ -92,6 +92,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                     "FROM apollo_type LEFT OUTER JOIN apollo_item "
                     "ON apollo_type.type_id = apollo_item.type_id "
                     "GROUP BY apollo_type.type_id "
+                    "ORDER BY apollo_type.type_name ASC "
                     )
                 );
         }
@@ -162,9 +163,12 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(
                 hades::join<type, item>(
                     conn,
-                    hades::where(
-                        "apollo_type.type_id = apollo_item.type_id AND apollo_type.type_id = ?",
-                        hades::row<int>(type_id)
+                    hades::filter(
+                        hades::where(
+                            "apollo_type.type_id = apollo_item.type_id AND apollo_type.type_id = ?",
+                            hades::row<int>(type_id)
+                            ),
+                        hades::order_by("apollo_type.type_name ASC")
                         )
                     )
                 );
@@ -178,7 +182,10 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(
                 hades::join<item, maker>(
                     conn,
-                    hades::where("apollo_item.maker_id = apollo_maker.maker_id")
+                    hades::filter(
+                        hades::where("apollo_item.maker_id = apollo_maker.maker_id"),
+                        hades::order_by("apollo_item.item_year ASC ")
+                        )
                     )
                 );
         }
@@ -261,6 +268,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                     "FROM apollo_maker LEFT OUTER JOIN apollo_item "
                     "ON apollo_maker.maker_id = apollo_item.maker_id "
                     "GROUP BY apollo_maker.maker_id "
+                    "ORDER BY apollo_maker.maker_name ASC "
                     )
                 );
         }
@@ -330,10 +338,13 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(
                 hades::outer_join<item, maker>(
                     conn,
-                    hades::where(
-                        "apollo_item.maker_id = apollo_maker.maker_id and "
-                        "apollo_item.maker_id = ?",
-                        hades::row<int>(maker_id)
+                    hades::filter(
+                        hades::where(
+                            "apollo_item.maker_id = apollo_maker.maker_id and "
+                            "apollo_item.maker_id = ?",
+                            hades::row<int>(maker_id)
+                            ),
+                        hades::order_by("apollo_item.item_name ASC")
                         )
                     )
                 );
@@ -347,7 +358,10 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
             return atlas::http::json_response(
                 hades::get_collection<item>(
                     conn,
-                    hades::where("apollo_item.year = ?", hades::row<int>(year))
+                    hades::filter(
+                        hades::where("apollo_item.year = ?", hades::row<int>(year)),
+                        hades::order_by("apollo_item.item_name ASC")
+                        )
                     )
                 );
         }
