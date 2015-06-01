@@ -105,18 +105,18 @@ apollo::attachment apollo::get_attachment(
 
     sqlite3_stmt *stmt;
     sqlite3_prepare(
-            conn.handle(),
-            "SELECT attachment_data FROM attachment WHERE attachment_id = ?",
-            -1,
-            &stmt,
-            nullptr
-            );
+        conn.handle(),
+        "SELECT attachment_data FROM apollo_attachment WHERE attachment_id = ?",
+        -1,
+        &stmt,
+        nullptr
+        );
     sqlite3_bind_int(stmt, 1, id.get_int<attr::attachment_id>());
     hades::step(stmt);
     out.data = std::vector<unsigned char>(
-            (unsigned char*)sqlite3_column_blob(stmt, 0),
-            (unsigned char*)sqlite3_column_blob(stmt, 0) + sqlite3_column_bytes(stmt, 0)
-            );
+        (unsigned char*)sqlite3_column_blob(stmt, 0),
+        (unsigned char*)sqlite3_column_blob(stmt, 0) + sqlite3_column_bytes(stmt, 0)
+        );
     return out;
 }
 
