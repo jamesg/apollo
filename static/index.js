@@ -49,7 +49,9 @@ var MakerPage = PageView.extend(
             gApplication.modal(m);
             this.listenTo(m, 'finished', this._items.fetch.bind(this._items));
         },
-        template: _.template($('#makerpage-template').html())
+        template: _.template($('#makerpage-template').html()),
+        render: function() {
+        }
     }
     );
 
@@ -102,7 +104,9 @@ var TypePage = PageView.extend(
             gApplication.modal(m);
             this.listenTo(m, 'finished', this._items.fetch.bind(this._items));
         },
-        template: _.template($('#typepage-template').html())
+        template: _.template($('#typepage-template').html()),
+        render: function() {
+        }
     }
     );
 
