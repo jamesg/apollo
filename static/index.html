@@ -23,7 +23,7 @@
 <body>
 
 <div id="modal-container" class="modal-container"></div>
-<ul class="navigation">
+<ul class="navigation navigation-pages">
     <li>
         <span class="oi" data-glyph="home" aria-hidden="true"> </span>
         <a href="index.html">Home</a>
@@ -33,7 +33,7 @@
         <a href="manage.html">Manage</a>
     </li>
 </ul>
-<ul id="navigation" class="navigation"></ul>
+<ul id="navigation" class="navigation navigation-breadcrumbs"></ul>
 <div id="template-content" class="content"></div>
 
 <script type="text/template" id="modal-template">
@@ -143,64 +143,64 @@
 <h2><% if(isNew) { print('New Item'); } else { print('Edit ' + item_name); } %></h2>
 <div class="aligned">
     <div class="group">
-    <label for="type_id">Type</label>
-    <select name="type_id">
-    </select>
+        <label>Type <select name="type_id"></select>
     </div>
-
     <div class="group">
-    <label for="maker_id">Maker</label>
-    <select name="maker_id">
-    </select>
+        <label>Maker <select name="maker_id"></select></label>
     </div>
-
     <div class="group">
-    <label for="item_year">Release year</label>
-    <input type="number" name="item_year" value="<%-item_year%>">
+        <label>
+            Release year
+            <input type="number" name="item_year" value="<%-item_year%>">
+        </label>
     </div>
-
     <div class="group">
-    <label for="item_name">Name</label>
-    <input type="text" name="item_name" value="<%-item_name%>"></input>
+        <label>
+            Name
+            <input type="text" name="item_name" value="<%-item_name%>"></input>
+        </label>
     </div>
-
     <div class="group">
-    <label for="item_notes">General notes</label>
-    <textarea name="item_notes"><%-item_notes%></textarea>
+        <label>General notes <textarea name="item_notes"><%-item_notes%></textarea></label>
     </div>
+</div>
 
-    <h3>Condition</h3>
+<h3>Condition</h3>
 
+<div class="aligned">
     <div class="group">
-    <label for="item_cond">Rating</label>
-    <select name="item_cond">
-        <option value="1"<% if(item_cond==1) { print(' selected'); } %>>1</option>
-        <option value="2"<% if(item_cond==2) { print(' selected'); } %>>2</option>
-        <option value="3"<% if(item_cond==3) { print(' selected'); } %>>3</option>
-        <option value="4"<% if(item_cond==4) { print(' selected'); } %>>4</option>
-        <option value="5"<% if(item_cond==5) { print(' selected'); } %>>5</option>
-    </select>
+        <label>
+            Rating
+            <select name="item_cond">
+                <option value="1"<% if(item_cond==1) { print(' selected'); } %>>1</option>
+                <option value="2"<% if(item_cond==2) { print(' selected'); } %>>2</option>
+                <option value="3"<% if(item_cond==3) { print(' selected'); } %>>3</option>
+                <option value="4"<% if(item_cond==4) { print(' selected'); } %>>4</option>
+                <option value="5"<% if(item_cond==5) { print(' selected'); } %>>5</option>
+            </select>
+        </label>
     </div>
-
     <div class="group">
-    <label for="item_cond_notes">Condition notes</label>
-    <textarea name="item_cond_notes"><%-item_cond_notes%></textarea>
+        <label>
+            Condition notes
+            <textarea name="item_cond_notes"><%-item_cond_notes%></textarea>
+        </label>
     </div>
 </div>
 </script>
 
 <script type="text/template" id="imageupload-template">
-    <div name="messagebox"></div>
+<div name="messagebox"></div>
 
 <div class="aligned">
     <div class="group">
-    <label for="attachment_title">Title</label>
-    <input type="text" name="attachment_title"></input>
+        <label>Title<input type="text" name="attachment_title"></input></label>
     </div>
-
     <div class="group">
-    <label for="attachment_data">File</label>
-    <input accept="image/*" type="file" name="attachment_data"></input>
+        <label>
+            File
+            <input accept="image/*" type="file" name="attachment_data"></input>
+        </label>
     </div>
 </div>
 </script>
@@ -256,9 +256,14 @@
 <caption><%-alt%></caption>
 </figure>
 
-<label for="attachment_title">Title</label>
-<input type="text" name="attachment_title" value="<%-attachment_title%>">
-</label>
+<div class="aligned">
+    <div class="group">
+        <label>
+            Title
+            <input type="text" name="attachment_title" value="<%-attachment_title%>">
+        </label>
+    </div>
+</div>
 </script>
 
 <script type="text/template" id="typecollectionpage-template">

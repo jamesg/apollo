@@ -23,7 +23,7 @@
 <body>
 
 <div id="modal-container" class="modal-container"></div>
-<ul class="navigation">
+<ul class="navigation navigation-pages">
     <li>
         <span class="oi" data-glyph="home" aria-hidden="true"> </span>
         <a href="index.html">Home</a>
@@ -33,7 +33,7 @@
         <a href="manage.html">Manage</a>
     </li>
 </ul>
-<ul id="navigation" class="navigation"></ul>
+<ul id="navigation" class="navigation navigation-breadcrumbs"></ul>
 <div id="template-content" class="content"></div>
 
 <script type="text/template" id="modal-template">
@@ -119,9 +119,13 @@
 <h3>
 <% if(isNew) print('New Maker'); else print('Edit Maker'); %>
 </h3>
-<div>
-    <label for="maker_name">Name</label>
-    <input type="text" name="maker_name" value="<%- maker_name %>"></input>
+<div class="aligned">
+    <div class="group">
+        <label>
+            Name
+            <input type="text" name="maker_name" value="<%- maker_name %>"></input>
+        </label>
+    </div>
 </div>
 </script>
 
@@ -130,15 +134,25 @@
 <h3>
 <% if(isNew) print('New Type'); else print('Edit Type'); %>
 </h3>
-<div>
-    <label for="type_name">Name</label>
-    <input type="text" name="type_name" value="<%- type_name %>"></input>
+<div class="aligned">
+    <div class="group">
+        <label>
+            Name
+            <input type="text" name="type_name" value="<%- type_name %>"></input>
+        </label>
+    </div>
 </div>
 </script>
 
 <script type="text/template" id="optionsform-template">
-<label for="collection_name">Collection name</label>
-<input type="text" name="collection_name" value="<%-collection_name%>"></input>
+<div class="aligned">
+    <div class="group">
+        <label>
+            Collection name
+            <input type="text" name="collection_name" value="<%-collection_name%>"></input>
+        </label>
+    </div>
+</div>
 </script>
 
 <script type="text/javascript" src="/atlas/underscore.js"></script>
