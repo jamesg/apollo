@@ -125,7 +125,7 @@ void apollo::insert_attachment(attachment& a, hades::connection& conn)
     sqlite3_stmt *stmt;
     sqlite3_prepare(
             conn.handle(),
-            "INSERT INTO attachment( "
+            "INSERT INTO apollo_attachment( "
             " attachment_title, attachment_orig_filename, "
             " attachment_upload_date, attachment_data "
             " ) VALUES (?, ?, ?, ?)",

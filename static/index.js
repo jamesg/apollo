@@ -215,15 +215,13 @@ var ImageUploadForm = StaticView.extend(
             var xhr = new XMLHttpRequest();
             xhr.open(
                     'post',
-                    '/item/' + this.model.get('item_id') + '/image',
+                    'item/' + this.model.get('item_id') + '/image',
                     true
                     );
             xhr.onload = reqListener;
             var formData = new FormData(this.el);
             this._messageBox.displayInformation('Uploading...');
             xhr.send(formData);
-
-            return false;
         }
     }
     );
