@@ -114,12 +114,50 @@ var ItemForm = StaticView.extend(
     {
         initialize: function(options) {
             StaticView.prototype.initialize.apply(this, arguments);
+            StaticView.prototype.render.apply(this);
             this.on('create', this.save.bind(this));
             this.on('save', this.save.bind(this));
             this._makers = new MakerCollection;
-            this._makers.fetch();
+            this._makers.fetch({
+                success: (function() {
+                    this.$('select[name=maker_id]').val(this.model.get('maker_id'));
+                }).bind(this)
+            });
             this._types = new TypeCollection;
-            this._types.fetch();
+            this._types.fetch({
+                success: (function() {
+                    this.$('select[name=type_id]').val(this.model.get('type_id'));
+                }).bind(this)
+            });
+
+            this._messageBox =
+                new MessageBox({ el: this.$('div[name=messagebox]') });
+            new CollectionView({
+                el: this.$('select[name=maker_id]'),
+                model: this._makers,
+                view: StaticView.extend({
+                    tagName: 'option',
+                    attributes: function() {
+                        return {
+                            value: this.model.get('maker_id')
+                        };
+                    },
+                    template: '<%-maker_name%>'
+                })
+            }).render();
+            new CollectionView({
+                el: this.$('select[name=type_id]'),
+                model: this._types,
+                view: StaticView.extend({
+                    tagName: 'option',
+                    attributes: function() {
+                        return {
+                            value: this.model.get('type_id')
+                        };
+                    },
+                    template: '<%-type_name%>'
+                })
+            }).render();
         },
         template: _.template($('#itemform-template').html()),
         templateParams: function() {
@@ -149,39 +187,6 @@ var ItemForm = StaticView.extend(
                 );
         },
         render: function() {
-            var itemForm = this;
-
-            this.$el.html(this.template(this.templateParams()));
-            this._messageBox =
-                new MessageBox({ el: this.$('div[name=messagebox]') });
-            new CollectionView({
-                el: this.$('select[name=maker_id]'),
-                model: this._makers,
-                view: StaticView.extend({
-                    tagName: 'option',
-                    attributes: function() {
-                        return {
-                            value: this.model.get('maker_id'),
-                            selected: (itemForm.model.get('maker_id') == this.model.get('maker_id'))
-                        };
-                    },
-                    template: '<%-maker_name%>'
-                })
-            }).render();
-            new CollectionView({
-                el: this.$('select[name=type_id]'),
-                model: this._types,
-                view: StaticView.extend({
-                    tagName: 'option',
-                    attributes: function() {
-                        return {
-                            value: this.model.get('type_id'),
-                            selected: (itemForm.model.get('type_id') == this.model.get('type_id'))
-                        };
-                    },
-                    template: '<%-type_name%>'
-                })
-            }).render();
         }
     }
     );
