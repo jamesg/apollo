@@ -17,9 +17,13 @@ namespace
     constexpr char item_count[] = "item_count";
 }
 
-boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& conn)
+boost::shared_ptr<atlas::http::router> apollo::rest::router(
+    boost::shared_ptr<boost::asio::io_service> io,
+    hades::connection& conn
+)
 {
-    boost::shared_ptr<atlas::http::router> router(new atlas::http::router);
+    boost::shared_ptr<atlas::http::router>
+        router(new atlas::http::router(io));
     // Options.
     router->install<std::string>(
         atlas::http::matcher("/option/([^/]+)", "DELETE"),
@@ -126,9 +130,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
 
             hades::devoid(
                 "UPDATE apollo_item SET type_id = 0 WHERE type_id = ?",
-                hades::row<int>(type_id),
+                hades::row<styx::int_type>(type_id),
                 conn
-                );
+            );
             type t;
             t.set_id(type::id_type{type_id});
             if(t.destroy(conn))
@@ -163,7 +167,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                     hades::filter(
                         hades::where(
                             "apollo_type.type_id = apollo_item.type_id AND apollo_type.type_id = ?",
-                            hades::row<int>(type_id)
+                            hades::row<styx::int_type>(type_id)
                             ),
                         hades::order_by("apollo_type.type_name ASC")
                         )
@@ -191,6 +195,27 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
         atlas::http::matcher("/item", "POST"),
         [&conn](item i) {
             i.insert(conn);
+            if(i.has_key("collections"))
+            {
+                styx::list collections;
+                for(const styx::element& e : i.get_list("collections"))
+                {
+                    collection c(e);
+                    item_in_collection ic;
+                    ic.get_int<attr::collection_id>() =
+                        c.copy_int<attr::collection_id>();
+                    ic.get_int<attr::item_id>() = i.copy_int<attr::item_id>();
+                    collections.append(ic);
+                }
+                item_in_collection::overwrite_collection(
+                    collections,
+                    hades::where(
+                        "item_in_collection.item_id = ?",
+                        hades::row<styx::int_type>(i.copy_int<attr::item_id>())
+                    ),
+                    conn
+                );
+            }
             return atlas::http::json_response(i);
         }
         );
@@ -215,7 +240,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 hades::where(
                     "apollo_item.maker_id = apollo_maker.maker_id and "
                     "apollo_item.item_id = ?",
-                    hades::row<int>(item_id)
+                    hades::row<styx::int_type>(item_id)
                     )
                 );
             if(items.size() != 1)
@@ -228,10 +253,29 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
     router->install_json<item, int>(
         atlas::http::matcher("/item/([0-9]+)", "PUT"),
         [&conn](item i, const int item_id) {
-            if(i.update(conn))
-                return atlas::http::json_response(i);
-            else
-                return atlas::http::json_error_response("Saving item");
+            i.update(conn);
+            if(i.has_key("collections"))
+            {
+                styx::list collections;
+                for(const styx::element& e : i.get_list("collections"))
+                {
+                    collection c(e);
+                    item_in_collection ic;
+                    ic.get_int<attr::collection_id>() =
+                        c.copy_int<attr::collection_id>();
+                    ic.get_int<attr::item_id>() = i.copy_int<attr::item_id>();
+                    collections.append(ic);
+                }
+                item_in_collection::overwrite_collection(
+                    collections,
+                    hades::where(
+                        "item_in_collection.item_id = ?",
+                        hades::row<styx::int_type>(i.copy_int<attr::item_id>())
+                    ),
+                    conn
+                );
+            }
+            return atlas::http::json_response(i);
         }
         );
 
@@ -245,7 +289,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                     hades::where(
                         "apollo_attachment.attachment_id = apollo_image_of.attachment_id AND "
                         "apollo_image_of.item_id = ? ",
-                        hades::row<int>(item_id)
+                        hades::row<styx::int_type>(item_id)
                         )
                     )
                 );
@@ -299,7 +343,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
 
             hades::devoid(
                 "UPDATE apollo_item SET maker_id = 0 WHERE maker_id = ?",
-                hades::row<int>(maker_id),
+                hades::row<styx::int_type>(maker_id),
                 conn
                 );
             maker m;
@@ -335,7 +379,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                         hades::where(
                             "apollo_item.maker_id = apollo_maker.maker_id and "
                             "apollo_item.maker_id = ?",
-                            hades::row<int>(maker_id)
+                            hades::row<styx::int_type>(maker_id)
                             ),
                         hades::order_by("apollo_item.item_name ASC")
                         )
@@ -352,7 +396,10 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 hades::get_collection<item>(
                     conn,
                     hades::filter(
-                        hades::where("apollo_item.year = ?", hades::row<int>(year)),
+                        hades::where(
+                            "apollo_item.year = ?",
+                            hades::row<styx::int_type>(year)
+                        ),
                         hades::order_by("apollo_item.item_name ASC")
                         )
                     )
@@ -395,7 +442,26 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(hades::connection& c
                 return atlas::http::json_error_response("deleting attachment");
         }
         );
+    router->install<>(
+        atlas::http::matcher("/collection", "GET"),
+        [&conn]() {
+            return atlas::http::json_response(collection::get_collection(conn));
+        }
+    );
+    router->install_json<collection>(
+        atlas::http::matcher("/collection", "POST"),
+        [&conn](collection c) {
+            c.save(conn);
+            return atlas::http::json_response(c);
+        }
+    );
+    router->install_json<collection>(
+        atlas::http::matcher("/collection/([0-9]+)", "PUT"),
+        [&conn](collection c) {
+            c.update(conn);
+            return atlas::http::json_response(c);
+        }
+    );
 
     return router;
 }
-

@@ -20,12 +20,16 @@ const char apollo::attr::attachment_id[] = "attachment_id";
 const char apollo::attr::attachment_orig_filename[] = "attachment_orig_filename";
 const char apollo::attr::attachment_title[] = "attachment_title";
 const char apollo::attr::attachment_upload_date[] = "attachment_upload_date";
+const char apollo::attr::collection_id[] = "collection_id";
+const char apollo::attr::collection_name[] = "collection_name";
 const char apollo::relvar::option[] = "apollo_option";
 const char apollo::relvar::type[] = "apollo_type";
 const char apollo::relvar::item[] = "apollo_item";
 const char apollo::relvar::maker[] = "apollo_maker";
 const char apollo::relvar::attachment[] = "apollo_attachment";
 const char apollo::relvar::image_of[] = "apollo_image_of";
+const char apollo::relvar::collection[] = "apollo_collection";
+const char apollo::relvar::item_in_collection[] = "apollo_item_in_collection";
 
 void apollo::db::create(hades::connection& conn)
 {
@@ -92,5 +96,19 @@ void apollo::db::create(hades::connection& conn)
         " ) ",
         conn
         );
+    hades::devoid(
+        "CREATE TABLE IF NOT EXISTS apollo_collection ( "
+        " collection_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        " collection_name VARCHAR "
+        ") ",
+        conn
+    );
+    hades::devoid(
+        "CREATE TABLE IF NOT EXISTS apollo_item_in_collection ( "
+        " item_id INTEGER REFERENCES apollo_item(item_id), "
+        " collection_id INTEGER REFERENCES apollo_collection(collection_id), "
+        " UNIQUE(item_id, collection_id) "
+        ") ",
+        conn
+    );
 }
-

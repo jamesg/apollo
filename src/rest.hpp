@@ -23,9 +23,11 @@ namespace apollo
         /*!
          * \brief Install Apollo REST URIs to a HTTP server.
          */
-        boost::shared_ptr<atlas::http::router> router(hades::connection&);
+        boost::shared_ptr<atlas::http::router> router(
+            boost::shared_ptr<boost::asio::io_service>,
+            hades::connection&
+        );
     }
 }
 
 #endif
-

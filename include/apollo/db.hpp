@@ -26,6 +26,8 @@ namespace apollo
         extern const char attachment_orig_filename[];
         extern const char attachment_title[];
         extern const char attachment_upload_date[];
+        extern const char collection_id[];
+        extern const char collection_name[];
     }
     namespace relvar
     {
@@ -35,6 +37,8 @@ namespace apollo
         extern const char maker[];
         extern const char attachment[];
         extern const char image_of[];
+        extern const char collection[];
+        extern const char item_in_collection[];
     }
 
     class option :
@@ -163,6 +167,46 @@ namespace apollo
         }
     };
 
+    class collection :
+        public hades::tuple<attr::collection_id, attr::collection_name>,
+        public hades::has_candidate_key<attr::collection_id>,
+        public hades::relation<relvar::collection>,
+        public hades::crud<collection>
+    {
+    public:
+        collection()
+        {
+        }
+        explicit collection(const styx::element& e) :
+            styx::object(e)
+        {
+        }
+    };
+
+    class item_in_collection :
+        public hades::tuple<attr::item_id, attr::collection_id>,
+        public hades::has_candidate_key<attr::item_id, attr::collection_id>,
+        public hades::relation<relvar::item_in_collection>,
+        public hades::crud<item_in_collection>
+    {
+    public:
+        item_in_collection()
+        {
+        }
+        explicit item_in_collection(const styx::element& e)
+        {
+        }
+        item_in_collection(
+            const item::id_type& item_id,
+            const collection::id_type& collection_id
+        )
+        {
+            get_int<attr::item_id>() = item_id.copy_int<attr::item_id>();
+            get_int<attr::collection_id>() =
+                collection_id.copy_int<attr::collection_id>();
+        }
+    };
+
     namespace db
     {
         void create(hades::connection&);
@@ -170,4 +214,3 @@ namespace apollo
 }
 
 #endif
-

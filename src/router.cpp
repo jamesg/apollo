@@ -28,7 +28,11 @@ APOLLO_DECLARE_STATIC_STRING(application_js)
 APOLLO_DECLARE_STATIC_STRING(models_js)
 APOLLO_DECLARE_STATIC_STRING(style_css)
 
-apollo::router::router(hades::connection& conn)
+apollo::router::router(
+    boost::shared_ptr<boost::asio::io_service> io,
+    hades::connection& conn
+) :
+    application_router(io)
 {
     //
     // Install static files.
@@ -43,7 +47,7 @@ apollo::router::router(hades::connection& conn)
     install_static_text("/models.js", APOLLO_STATIC_STD_STRING(models_js));
     install_static_text("/style.css", APOLLO_STATIC_STD_STRING(style_css));
 
-    boost::shared_ptr<atlas::http::router> rest_router(rest::router(conn));
+    boost::shared_ptr<atlas::http::router> rest_router(rest::router(io, conn));
     install(
             atlas::http::matcher("/api(.*)"),
             boost::bind(&atlas::http::router::serve, rest_router, _1, _2, _3, _4)
@@ -53,7 +57,7 @@ apollo::router::router(hades::connection& conn)
         atlas::http::matcher("/item/([0-9]+)/image", "POST"),
         [&conn](
             mg_connection *mg_conn,
-            boost::smatch args,
+            atlas::http::uri_parameters_type args,
             atlas::http::uri_callback_type success,
             atlas::http::uri_callback_type failure
             )
@@ -66,7 +70,7 @@ apollo::router::router(hades::connection& conn)
         atlas::http::matcher("/attachment", "POST"),
         [&conn](
             mg_connection *mg_conn,
-            boost::smatch args,
+            atlas::http::uri_parameters_type args,
             atlas::http::uri_callback_type success,
             atlas::http::uri_callback_type failure
             )
@@ -95,7 +99,7 @@ apollo::router::router(hades::connection& conn)
         atlas::http::matcher("/attachment/([0-9]+)", "GET"),
         [this, &conn](
             mg_connection *mg_conn,
-            boost::smatch args,
+            atlas::http::uri_parameters_type args,
             atlas::http::uri_callback_type success,
             atlas::http::uri_callback_type failure
             )
@@ -116,7 +120,7 @@ apollo::router::router(hades::connection& conn)
         atlas::http::matcher("/attachment/([0-9]+)/image/([0-9]+)x([0-9]+)", "GET"),
         [this, &conn](
             mg_connection *mg_conn,
-            boost::smatch args,
+            atlas::http::uri_parameters_type args,
             atlas::http::uri_callback_type success,
             atlas::http::uri_callback_type failure
             )
@@ -137,4 +141,3 @@ apollo::router::router(hades::connection& conn)
         }
         );
 }
-
