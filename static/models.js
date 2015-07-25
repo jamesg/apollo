@@ -5,6 +5,25 @@ var restUri = function(fragment) {
     return 'api' + fragment;
 };
 
+var Collection = RestModel.extend(
+    {
+        defaults: {
+            collection_name: ''
+        },
+        idAttribute: 'collection_id',
+        url: function() {
+            return restUri(this.isNew()?'/collection':('/collection/' + this.get('collection_id')));
+        }
+    }
+);
+
+var CollectionCollection = RestCollection.extend(
+    {
+        model: Collection,
+        url: restUri('/collection')
+    }
+);
+
 var Type = RestModel.extend(
     {
         defaults: {
@@ -162,4 +181,3 @@ var Options = RestModel.extend(
         isNew: function() { return false; }
     }
     );
-

@@ -132,9 +132,52 @@ var ItemForm = StaticView.extend(
 
             this._messageBox =
                 new MessageBox({ el: this.$('div[name=messagebox]') });
-            new CollectionView({
+
+            var collections = new CollectionCollection;
+            var collectionView = this._collectionView = new CheckedCollectionView({
+                el: this.$('ul[name=collections]'),
+                model: collections,
+                view: StaticView.extend({
+                    tagName: 'li',
+                    template: '<label><input type="checkbox"></input><%-collection_name%></label>',
+                    events: {
+                        'change input': function() {
+                            console.log('input change')
+                            makersView.render();
+                            typesView.render();
+                        }
+                    }
+                })
+            });
+            collections.fetch({
+                success: (function() {
+                    collectionView.setChecked(
+                        new CollectionCollection(this.model.get('collections'))
+                    );
+                    makersView.render();
+                    typesView.render();
+                }).bind(this)
+            });
+
+            var makersView = new (CollectionView.extend({
+                render: function() {
+                    var val = this.$el.val();
+                    CollectionView.prototype.render.apply(this, arguments);
+                    this.$el.val(val);
+                }
+            }))({
                 el: this.$('select[name=maker_id]'),
                 model: this._makers,
+                filter: (function(maker) {
+                    // Maker is unknown or a related collection is checked.
+                    return (maker.id == 0) || maker.get('collections').length == 0 ||
+                        this.model.get('maker_id') == maker.id ||
+                        (_.intersection(
+                            collectionView.checkedIds(),
+                            (new CollectionCollection(maker.get('collections')))
+                                .pluck('collection_id')
+                        ).length > 0);
+                }).bind(this),
                 view: StaticView.extend({
                     tagName: 'option',
                     attributes: function() {
@@ -144,10 +187,29 @@ var ItemForm = StaticView.extend(
                     },
                     template: '<%-maker_name%>'
                 })
-            }).render();
-            new CollectionView({
+            });
+            makersView.render();
+            var typesView = new (CollectionView.extend({
+                render: function() {
+                    var val = this.$el.val();
+                    CollectionView.prototype.render.apply(this, arguments);
+                    this.$el.val(val);
+                }
+            }))({
                 el: this.$('select[name=type_id]'),
                 model: this._types,
+                filter: (function(type) {
+                    console.log('filter type', type.attributes, collectionView.checkedIds(), (new CollectionCollection(type.get('collections')))
+                                .pluck('collection_id'))
+                    // Maker is unknown or a related collection is checked.
+                    return (type.id == 0) || type.get('collections').length == 0 ||
+                        this.model.get('type_id') == type.id ||
+                        (_.intersection(
+                            collectionView.checkedIds(),
+                            (new CollectionCollection(type.get('collections')))
+                                .pluck('collection_id')
+                        ).length > 0);
+                }).bind(this),
                 view: StaticView.extend({
                     tagName: 'option',
                     attributes: function() {
@@ -157,7 +219,8 @@ var ItemForm = StaticView.extend(
                     },
                     template: '<%-type_name%>'
                 })
-            }).render();
+            });
+            typesView.render();
         },
         template: _.template($('#itemform-template').html()),
         templateParams: function() {
@@ -172,7 +235,8 @@ var ItemForm = StaticView.extend(
                 item_notes: this.$('textarea[name=item_notes]').val(),
                 item_year: this.$('input[name=item_year]').val(),
                 item_cond: this.$('select[name=item_cond]').val(),
-                item_cond_notes: this.$('textarea[name=item_cond_notes]').val()
+                item_cond_notes: this.$('textarea[name=item_cond_notes]').val(),
+                collections: this._collectionView.checked()
             });
             this.model.save(
                 {},
@@ -564,4 +628,3 @@ var HomePage = PageView.extend(
         template: _.template($('#homepage-template').html())
     }
     );
-

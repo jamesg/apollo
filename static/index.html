@@ -3,7 +3,7 @@
 
 <head>
 
-<title>Computer Collection</title>
+<title>Collection</title>
 <link href="/atlas/css/defaults.css" rel="stylesheet" type="text/css" media="all"></link>
 <link href="/atlas/css/form.css" rel="stylesheet" type="text/css" media="all"></link>
 <link href="/atlas/css/grid.css" rel="stylesheet" type="text/css" media="all"></link>
@@ -35,56 +35,6 @@
 </ul>
 <ul id="navigation" class="navigation navigation-breadcrumbs"></ul>
 <div id="template-content" class="content"></div>
-
-<script type="text/template" id="modal-template">
-<div class="modal">
-    <div class="modal-dialog">
-        <form class="modal-content" name="modal-content">
-        </form>
-    </div>
-    <div class="modal-button-box">
-        <% if(_(buttons).has(['close'])) { %>
-        <button type="button" name="close">
-            <span class="oi" data-glyph="x" aria-hidden="true"> </span>
-            Close
-        </button>
-        <% } %>
-        <% if(_(buttons).has(['cancel'])) print('<button type="button" name="cancel">Cancel</button>'); %>
-        <% if(_(buttons).has(['no'])) { %>
-        <button type="button" name="no">
-            <span class="oi" data-glyph="x" aria-hidden="true"> </span>
-            No
-        </button>
-        <% } %>
-
-
-        <% if(_(buttons).has(['destroy'])) { %>
-        <button type="button" name="destroy">
-            <span class="oi" data-glyph="trash" aria-hidden="true"> </span>
-            Delete
-        </button>
-        <% } %>
-        <% if(_(buttons).has(['save'])) { %>
-        <button type="button" name="save">
-            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
-            Save
-        </button>
-        <% } %>
-        <% if(_(buttons).has(['create'])) { %>
-        <button type="button" name="create">
-            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
-            Create
-        </button>
-        <% } %>
-        <% if(_(buttons).has(['yes'])) { %>
-        <button type="button" name="yes">
-            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
-            Yes
-        </button>
-        <% } %>
-    </div>
-</div>
-</script>
 
 <script type="text/template" id="homepage-template">
 <h1 name="application_title"></h1>
@@ -142,6 +92,9 @@
 <script type="text/template" id="itemform-template">
 <h2><% if(isNew) { print('New Item'); } else { print('Edit ' + item_name); } %></h2>
 <div class="aligned">
+    <h3>Collections</h3>
+    <ul name="collections" class="action-list"></ul>
+    <h3>Details</h3>
     <div class="group">
         <label>Type <select name="type_id"></select>
     </div>
@@ -217,6 +170,10 @@
 <ul class="action-list image-list" name="images"></ul>
 
 <h2>General Information</h2>
+
+<h3>Collections</h3>
+<ul name="collections"></ul>
+
 <emph>Year of Release</emph> <%-item_year%>
 
 <h3>Notes</h3>
@@ -297,4 +254,3 @@ gApplication.goHome();
 </body>
 
 </html>
-

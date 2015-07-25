@@ -39,6 +39,8 @@ namespace apollo
         extern const char image_of[];
         extern const char collection[];
         extern const char item_in_collection[];
+        extern const char collection_maker[];
+        extern const char collection_type[];
     }
 
     class option :
@@ -177,7 +179,7 @@ namespace apollo
         collection()
         {
         }
-        explicit collection(const styx::element& e) :
+        collection(const styx::element& e) :
             styx::object(e)
         {
         }
@@ -193,7 +195,8 @@ namespace apollo
         item_in_collection()
         {
         }
-        explicit item_in_collection(const styx::element& e)
+        explicit item_in_collection(const styx::element& e) :
+            styx::object(e)
         {
         }
         item_in_collection(
@@ -204,6 +207,56 @@ namespace apollo
             get_int<attr::item_id>() = item_id.copy_int<attr::item_id>();
             get_int<attr::collection_id>() =
                 collection_id.copy_int<attr::collection_id>();
+        }
+    };
+
+    class collection_maker :
+        public hades::tuple<attr::collection_id, attr::maker_id>,
+        public hades::has_candidate_key<attr::collection_id, attr::maker_id>,
+        public hades::relation<relvar::collection_maker>,
+        public hades::crud<collection_maker>
+    {
+    public:
+        collection_maker()
+        {
+        }
+        explicit collection_maker(const styx::element& e) :
+            styx::object(e)
+        {
+        }
+        collection_maker(
+            const collection::id_type& collection_id,
+            const maker::id_type& maker_id
+        )
+        {
+            get_int<attr::collection_id>() =
+                collection_id.copy_int<attr::collection_id>();
+            get_int<attr::maker_id>() = maker_id.copy_int<attr::maker_id>();
+        }
+    };
+
+    class collection_type :
+        public hades::tuple<attr::collection_id, attr::type_id>,
+        public hades::has_candidate_key<attr::collection_id, attr::type_id>,
+        public hades::relation<relvar::collection_type>,
+        public hades::crud<collection_type>
+    {
+    public:
+        collection_type()
+        {
+        }
+        explicit collection_type(const styx::element& e) :
+            styx::object(e)
+        {
+        }
+        collection_type(
+            const collection::id_type& collection_id,
+            const type::id_type& type_id
+        )
+        {
+            get_int<attr::collection_id>() =
+                collection_id.copy_int<attr::collection_id>();
+            get_int<attr::type_id>() = type_id.copy_int<attr::type_id>();
         }
     };
 

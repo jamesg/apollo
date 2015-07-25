@@ -24,7 +24,11 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
 {
     boost::shared_ptr<atlas::http::router>
         router(new atlas::http::router(io));
+
+    //
     // Options.
+    //
+
     router->install<std::string>(
         atlas::http::matcher("/option/([^/]+)", "DELETE"),
         [&conn](const std::string option_name) {
@@ -39,7 +43,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
             else
                 return atlas::http::json_error_response("deleting option");
         }
-        );
+    );
     router->install<std::string>(
         atlas::http::matcher("/option/([^/]+)", "GET"),
         [&conn](const std::string option_name) {
@@ -50,7 +54,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
                     )
                 );
         }
-        );
+    );
     router->install<>(
         atlas::http::matcher("/option", "GET"),
         [&conn]() {
@@ -64,7 +68,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
             }
             return atlas::http::json_response(out);
         }
-        );
+    );
     router->install_json<styx::object>(
         atlas::http::matcher("/option", "PUT"),
         [&conn](styx::object o) {
@@ -83,23 +87,64 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
             }
             return atlas::http::json_response(out);
         }
-        );
-    // Type collection.
+    );
+
+    //
+    // Types.
+    //
+
+    // Types that relate to a collection.
+    router->install<styx::int_type>(
+        atlas::http::matcher("/collection/([0-9]+)/type", "GET"),
+        [&conn](const styx::int_type collection_id) {
+            return atlas::http::json_response(
+                hades::custom_select<type, hades::row<styx::int_type>, attr::type_id, attr::type_name, item_count>(
+                    conn,
+                    "SELECT apollo_type.type_id, apollo_type.type_name, COUNT(apollo_item.item_id) "
+                    "FROM apollo_type "
+                    "LEFT OUTER JOIN apollo_item "
+                    "ON apollo_type.type_id = apollo_item.type_id "
+                    "JOIN apollo_collection_type "
+                    "ON apollo_type.type_id = apollo_collection_type.type_id "
+                    "WHERE apollo_collection_type.collection_id = ? "
+                    "GROUP BY apollo_type.type_id "
+                    "ORDER BY apollo_type.type_name ASC ",
+                    hades::row<styx::int_type>(collection_id)
+                )
+            );
+        }
+    );
     router->install<>(
         atlas::http::matcher("/type", "GET"),
         [&conn]() {
-            return atlas::http::json_response(
-                hades::custom_select<type, attr::type_id, attr::type_name, item_count>(
-                    conn,
-                    "SELECT apollo_type.type_id, apollo_type.type_name, COUNT(apollo_item.item_id) "
-                    "FROM apollo_type LEFT OUTER JOIN apollo_item "
-                    "ON apollo_type.type_id = apollo_item.type_id "
-                    "GROUP BY apollo_type.type_id "
-                    "ORDER BY apollo_type.type_name ASC "
-                    )
-                );
+            styx::list types = hades::custom_select<
+                type, attr::type_id, attr::type_name, item_count>(
+                conn,
+                "SELECT apollo_type.type_id, apollo_type.type_name, COUNT(apollo_item.item_id) "
+                "FROM apollo_type LEFT OUTER JOIN apollo_item "
+                "ON apollo_type.type_id = apollo_item.type_id "
+                "GROUP BY apollo_type.type_id "
+                "ORDER BY apollo_type.type_name ASC "
+            );
+            for(styx::element& e : types)
+            {
+                styx::object& o = boost::get<styx::object>(e);
+                o.get_list("collections") = hades::custom_select<
+                    collection,
+                    hades::row<styx::int_type>,
+                    attr::collection_id,
+                    attr::collection_name>(
+                        conn,
+                        "SELECT apollo_collection.collection_id, apollo_collection.collection_name "
+                        " FROM  apollo_collection, apollo_collection_type "
+                        " WHERE apollo_collection.collection_id = apollo_collection_type.collection_id "
+                        " AND apollo_collection_type.type_id = ? ",
+                        hades::row<styx::int_type>(o.copy_int(attr::type_id))
+                    );
+            }
+            return atlas::http::json_response(types);
         }
-        );
+    );
     router->install_json<type>(
         atlas::http::matcher("/type", "POST"),
         [&conn](type t) {
@@ -117,11 +162,15 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
                         t.get_string<attr::type_name>() << "' already present"
                     );
             t.insert(conn);
+            styx::list collections;
+            for(collection c : t.get_list("collections"))
+                collections.append(
+                    collection_type(c.id(), t.id())
+                );
+            collection_type::save_collection(collections, conn);
             return atlas::http::json_response(t);
         }
-        );
-
-    // Type detail.
+    );
     router->install<int>(
         atlas::http::matcher("/type/([0-9]+)", "DELETE"),
         [&conn](const int type_id) {
@@ -140,24 +189,48 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
             else
                 return atlas::http::json_error_response("deleting type");
         }
-        );
+    );
     router->install<int>(
         atlas::http::matcher("/type/([0-9]+)", "GET"),
         [&conn](const int type_id) {
-            return atlas::http::json_response(
-                hades::get_by_id<type>(conn, type::id_type{type_id})
+            type t = hades::get_by_id<type>(conn, type::id_type{type_id});
+            t.get_list("collections") = hades::custom_select<
+                collection,
+                hades::row<styx::int_type>,
+                attr::collection_id,
+                attr::collection_name>(
+                    conn,
+                    "SELECT apollo_collection.collection_id, apollo_collection.collection_name "
+                    " FROM  apollo_collection, apollo_collection_type "
+                    " WHERE apollo_collection.collection_id = apollo_collection_type.collection_id "
+                    " AND apollo_collection_type.type_id = ? ",
+                    hades::row<styx::int_type>(t.copy_int<attr::type_id>())
                 );
+            return atlas::http::json_response(t);
         }
-        );
+    );
     router->install_json<type, int>(
         atlas::http::matcher("/type/([0-9]+)", "PUT"),
         [&conn](type t, const int type_id) {
             t.update(conn);
+            styx::list collections;
+            for(collection c : t.get_list("collections"))
+                collections.append(
+                    collection_type(c.id(), t.id())
+                );
+            collection_type::overwrite_collection(
+                collections,
+                hades::where(
+                    "apollo_collection_type.type_id = ? ",
+                    hades::row<styx::int_type>(t.copy_int<attr::type_id>())
+                ),
+                conn
+            );
             return atlas::http::json_response(t);
         }
-        );
+    );
 
-    // Type item collection.
+    // Items of a given type.
     router->install<int>(
         atlas::http::matcher("/type/([0-9]+)/item", "GET"),
         [&conn](const int type_id) {
@@ -176,19 +249,34 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
         }
         );
 
-    // Item collection.
+    // All items.
     router->install<>(
         atlas::http::matcher("/item", "GET"),
         [&conn]() {
-            return atlas::http::json_response(
-                hades::join<item, maker>(
-                    conn,
-                    hades::filter(
-                        hades::where("apollo_item.maker_id = apollo_maker.maker_id"),
-                        hades::order_by("apollo_item.item_year ASC ")
-                        )
-                    )
-                );
+            styx::list items = hades::join<item, maker>(
+                conn,
+                hades::filter(
+                    hades::where("apollo_item.maker_id = apollo_maker.maker_id"),
+                    hades::order_by("apollo_item.item_year ASC ")
+                )
+            );
+            for(styx::element& e : items) {
+                styx::object& i = boost::get<styx::object>(e);
+                i.get_list("collections") = hades::custom_select<
+                    collection,
+                    hades::row<styx::int_type>,
+                    attr::collection_id,
+                    attr::collection_name>(
+                        conn,
+                        "SELECT apollo_collection.collection_id, collection_name "
+                        "FROM apollo_collection, apollo_item_in_collection "
+                        "WHERE apollo_collection.collection_id = "
+                        " apollo_item_in_collection.collection_id "
+                        "AND apollo_item_in_collection.item_id = ? ",
+                        hades::row<styx::int_type>(i.copy_int(attr::item_id))
+                    );
+            }
+            return atlas::http::json_response(items);
         }
         );
     router->install_json<item>(
@@ -235,19 +323,30 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
     router->install<int>(
         atlas::http::matcher("/item/([0-9]+)", "GET"),
         [&conn](const int item_id) {
-            styx::list items = hades::outer_join<item, maker>(
-                conn,
-                hades::where(
-                    "apollo_item.maker_id = apollo_maker.maker_id and "
-                    "apollo_item.item_id = ?",
-                    hades::row<styx::int_type>(item_id)
+            item i = styx::first(
+                hades::outer_join<item, maker>(
+                    conn,
+                    hades::where(
+                        "apollo_item.maker_id = apollo_maker.maker_id and "
+                        "apollo_item.item_id = ?",
+                        hades::row<styx::int_type>(item_id)
                     )
+                )
+            );
+            i.get_list("collections") = hades::custom_select<
+                collection,
+                hades::row<styx::int_type>,
+                attr::collection_id,
+                attr::collection_name>(
+                    conn,
+                    "SELECT apollo_collection.collection_id, collection_name "
+                    "FROM apollo_collection, apollo_item_in_collection "
+                    "WHERE apollo_collection.collection_id = "
+                    " apollo_item_in_collection.collection_id "
+                    "AND apollo_item_in_collection.item_id = ? ",
+                    hades::row<styx::int_type>(i.copy_int<attr::item_id>())
                 );
-            if(items.size() != 1)
-                return atlas::http::json_error_response(
-                    hades::mkstr() << "no item with id " << item_id
-                    );
-            return atlas::http::json_response(items.at(0));
+            return atlas::http::json_response(i);
         }
         );
     router->install_json<item, int>(
@@ -269,7 +368,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
                 item_in_collection::overwrite_collection(
                     collections,
                     hades::where(
-                        "item_in_collection.item_id = ?",
+                        "apollo_item_in_collection.item_id = ?",
                         hades::row<styx::int_type>(i.copy_int<attr::item_id>())
                     ),
                     conn
@@ -296,22 +395,61 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
         }
         );
 
-    // Maker collection.
+    //
+    // Makers.
+    //
+
+    // Makers related to a given collection.
+    router->install<styx::int_type>(
+        atlas::http::matcher("/collection/([0-9]+)/maker", "GET"),
+        [&conn](const styx::int_type collection_id) {
+            return atlas::http::json_response(
+                hades::custom_select<type, hades::row<styx::int_type>, attr::maker_id, attr::maker_name, item_count>(
+                    conn,
+                    "SELECT apollo_maker.maker_id, apollo_maker.maker_name, COUNT(apollo_item.item_id) "
+                    "FROM apollo_maker "
+                    "LEFT OUTER JOIN apollo_item "
+                    "ON apollo_maker.maker_id = apollo_item.maker_id "
+                    "JOIN apollo_collection_maker "
+                    "ON apollo_maker.maker_id = apollo_collection_maker.maker_id "
+                    "WHERE apollo_collection_maker.collection_id = ? "
+                    "GROUP BY apollo_maker.maker_id "
+                    "ORDER BY apollo_maker.maker_name ASC ",
+                    hades::row<styx::int_type>(collection_id)
+                )
+            );
+        }
+    );
     router->install<>(
         atlas::http::matcher("/maker", "GET"),
         [&conn]() {
-            return atlas::http::json_response(
-                hades::custom_select<maker, attr::maker_id, attr::maker_name, item_count>(
-                    conn,
-                    "SELECT apollo_maker.maker_id, apollo_maker.maker_name, COUNT(apollo_item.item_id) "
-                    "FROM apollo_maker LEFT OUTER JOIN apollo_item "
-                    "ON apollo_maker.maker_id = apollo_item.maker_id "
-                    "GROUP BY apollo_maker.maker_id "
-                    "ORDER BY apollo_maker.maker_name ASC "
-                    )
-                );
+            styx::list makers = hades::custom_select<maker, attr::maker_id, attr::maker_name, item_count>(
+                conn,
+                "SELECT apollo_maker.maker_id, apollo_maker.maker_name, COUNT(apollo_item.item_id) "
+                "FROM apollo_maker LEFT OUTER JOIN apollo_item "
+                "ON apollo_maker.maker_id = apollo_item.maker_id "
+                "GROUP BY apollo_maker.maker_id "
+                "ORDER BY apollo_maker.maker_name ASC "
+            );
+            for(styx::element& e : makers)
+            {
+                styx::object& o = boost::get<styx::object>(e);
+                o.get_list("collections") = hades::custom_select<
+                    collection,
+                    hades::row<styx::int_type>,
+                    attr::collection_id,
+                    attr::collection_name>(
+                        conn,
+                        "SELECT apollo_collection.collection_id, apollo_collection.collection_name "
+                        " FROM  apollo_collection, apollo_collection_maker "
+                        " WHERE apollo_collection.collection_id = apollo_collection_maker.collection_id "
+                        " AND apollo_collection_maker.maker_id = ? ",
+                        hades::row<styx::int_type>(o.copy_int(attr::maker_id))
+                    );
+            }
+            return atlas::http::json_response(makers);
         }
-        );
+    );
     router->install_json<maker>(
         atlas::http::matcher("/maker", "POST"),
         [&conn](maker m) {
@@ -330,6 +468,12 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
                     );
 
             m.insert(conn);
+            styx::list collections;
+            for(collection c : m.get_list("collections"))
+                collections.append(
+                    collection_maker(c.id(), m.id())
+                );
+            collection_maker::save_collection(collections, conn);
             return atlas::http::json_response(m);
         }
         );
@@ -357,15 +501,39 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
     router->install<int>(
         atlas::http::matcher("/maker/([0-9]+)", "GET"),
         [&conn](const int maker_id) {
-            return atlas::http::json_response(
-                hades::get_by_id<maker>(conn, maker::id_type{maker_id})
+            maker m = hades::get_by_id<maker>(conn, maker::id_type{maker_id});
+            m.get_list("collections") = hades::custom_select<
+                collection,
+                hades::row<styx::int_type>,
+                attr::collection_id,
+                attr::collection_name>(
+                    conn,
+                    "SELECT apollo_collection.collection_id, apollo_collection.collection_name "
+                    " FROM  apollo_collection, apollo_collection_maker "
+                    " WHERE apollo_collection.collection_id = apollo_collection_maker.collection_id "
+                    " AND apollo_collection_maker.maker_id = ? ",
+                    hades::row<styx::int_type>(m.copy_int<attr::maker_id>())
                 );
+            return atlas::http::json_response(m);
         }
         );
     router->install_json<maker, int>(
         atlas::http::matcher("/maker/([0-9]+)", "PUT"),
         [&conn](maker m, const int maker_id) {
             m.update(conn);
+            styx::list collections;
+            for(collection c : m.get_list("collections"))
+                collections.append(
+                    collection_maker(c.id(), m.id())
+                );
+            collection_maker::overwrite_collection(
+                collections,
+                hades::where(
+                    "apollo_collection_maker.maker_id = ? ",
+                    hades::row<styx::int_type>(m.copy_int<attr::maker_id>())
+                ),
+                conn
+            );
             return atlas::http::json_response(m);
         }
         );
@@ -441,7 +609,12 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
             else
                 return atlas::http::json_error_response("deleting attachment");
         }
-        );
+    );
+
+    //
+    // Collections.
+    //
+
     router->install<>(
         atlas::http::matcher("/collection", "GET"),
         [&conn]() {

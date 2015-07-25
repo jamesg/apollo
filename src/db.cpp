@@ -30,6 +30,8 @@ const char apollo::relvar::attachment[] = "apollo_attachment";
 const char apollo::relvar::image_of[] = "apollo_image_of";
 const char apollo::relvar::collection[] = "apollo_collection";
 const char apollo::relvar::item_in_collection[] = "apollo_item_in_collection";
+const char apollo::relvar::collection_maker[] = "apollo_collection_maker";
+const char apollo::relvar::collection_type[] = "apollo_collection_type";
 
 void apollo::db::create(hades::connection& conn)
 {
@@ -67,8 +69,8 @@ void apollo::db::create(hades::connection& conn)
     hades::devoid(
         "CREATE TABLE IF NOT EXISTS apollo_item ( "
         " item_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        " type_id INTEGER REFERENCES type(type_id), "
-        " maker_id INTEGER REFERENCES maker(maker_id), "
+        " type_id INTEGER REFERENCES apollo_type(type_id), "
+        " maker_id INTEGER REFERENCES apollo_maker(maker_id), "
         " item_name VARCHAR, "
         " item_notes VARCHAR, "
         " item_year INTEGER, "
@@ -108,6 +110,22 @@ void apollo::db::create(hades::connection& conn)
         " item_id INTEGER REFERENCES apollo_item(item_id), "
         " collection_id INTEGER REFERENCES apollo_collection(collection_id), "
         " UNIQUE(item_id, collection_id) "
+        ") ",
+        conn
+    );
+    hades::devoid(
+        "CREATE TABLE IF NOT EXISTS apollo_collection_maker ( "
+        " maker_id INTEGER REFERENCES apollo_maker(maker_id), "
+        " collection_id INTEGER REFERENCES apollo_collection(collection_id), "
+        " UNIQUE(maker_id, collection_id) "
+        ") ",
+        conn
+    );
+    hades::devoid(
+        "CREATE TABLE IF NOT EXISTS apollo_collection_type ( "
+        " type_id INTEGER REFERENCES apollo_type(type_id), "
+        " collection_id INTEGER REFERENCES apollo_collection(collection_id), "
+        " UNIQUE(type_id, collection_id) "
         ") ",
         conn
     );

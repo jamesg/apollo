@@ -3,7 +3,7 @@
 
 <head>
 
-<title>Computer Collection - Management</title>
+<title>Collection - Management</title>
 <link href="/atlas/css/defaults.css" rel="stylesheet" type="text/css" media="all"></link>
 <link href="/atlas/css/form.css" rel="stylesheet" type="text/css" media="all"></link>
 <link href="/atlas/css/grid.css" rel="stylesheet" type="text/css" media="all"></link>
@@ -36,56 +36,6 @@
 <ul id="navigation" class="navigation navigation-breadcrumbs"></ul>
 <div id="template-content" class="content"></div>
 
-<script type="text/template" id="modal-template">
-<div class="modal">
-    <div class="modal-dialog">
-        <form class="modal-content" name="modal-content">
-        </form>
-    </div>
-    <div class="modal-button-box">
-        <% if(_(buttons).has(['close'])) { %>
-        <button type="button" name="close">
-            <span class="oi" data-glyph="x" aria-hidden="true"> </span>
-            Close
-        </button>
-        <% } %>
-        <% if(_(buttons).has(['cancel'])) print('<button type="button" name="cancel">Cancel</button>'); %>
-        <% if(_(buttons).has(['no'])) { %>
-        <button type="button" name="no">
-            <span class="oi" data-glyph="x" aria-hidden="true"> </span>
-            No
-        </button>
-        <% } %>
-
-
-        <% if(_(buttons).has(['destroy'])) { %>
-        <button type="button" name="destroy">
-            <span class="oi" data-glyph="trash" aria-hidden="true"> </span>
-            Delete
-        </button>
-        <% } %>
-        <% if(_(buttons).has(['save'])) { %>
-        <button type="button" name="save">
-            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
-            Save
-        </button>
-        <% } %>
-        <% if(_(buttons).has(['create'])) { %>
-        <button type="button" name="create">
-            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
-            Create
-        </button>
-        <% } %>
-        <% if(_(buttons).has(['yes'])) { %>
-        <button type="button" name="yes">
-            <span class="oi" data-glyph="check" aria-hidden="true"> </span>
-            Yes
-        </button>
-        <% } %>
-    </div>
-</div>
-</script>
-
 <script type="text/template" id="manage-homepage">
 <div name="modal-container"></div>
 <h1 name="application_title"></h1>
@@ -99,18 +49,38 @@
 </div>
 
 <div class="grid">
-    <div class="col-1-2">
+    <div class="col-1-3">
+        <h2>Collections</h2>
+        <button name="new-collection">New</button>
+        <ul class="text-list action-list" name="collections"></ul>
+    </div>
+    <div class="col-1-3">
         <h2>Makers</h2>
         <button name="new-maker">New</button>
         <ul class="text-list action-list" name="makers"></ul>
     </div>
-    <div class="col-1-2">
+    <div class="col-1-3">
         <h2>Types</h2>
         <button name="new-type">New</button>
         <ul class="text-list action-list" name="types"></ul>
     </div>
 </div>
 
+</div>
+</script>
+
+<script type="text/template" id="collection-form-template">
+<div name="messagebox"></div>
+<h3>
+<% if(isNew) print('New Collection'); else print('Edit Collection'); %>
+</h3>
+<div class="aligned">
+    <div class="group">
+        <label>
+            Name
+            <input type="text" name="collection_name" value="<%- collection_name %>"></input>
+        </label>
+    </div>
 </div>
 </script>
 
@@ -127,6 +97,8 @@
         </label>
     </div>
 </div>
+<h3>Collections</h3>
+<ul class="action-list" name="collections"></ul>
 </script>
 
 <script type="text/template" id="type-form-template">
@@ -142,6 +114,8 @@
         </label>
     </div>
 </div>
+<h3>Collections</h3>
+<ul class="action-list" name="collections"></ul>
 </script>
 
 <script type="text/template" id="optionsform-template">
@@ -171,4 +145,3 @@ gApplication.goHome();
 </body>
 
 </html>
-
