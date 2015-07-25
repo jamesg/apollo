@@ -519,7 +519,7 @@ var MakerCollectionPage = PageView.extend(
 
 var HomePage = PageView.extend(
     {
-        pageTitle: 'Computer Collection',
+        pageTitle: 'Collection',
         events: {
             'click [name=new-item]': 'showCreateDialog',
             'click [name=makercollection]': 'gotoMakers',

@@ -298,7 +298,7 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
                 item_in_collection::overwrite_collection(
                     collections,
                     hades::where(
-                        "item_in_collection.item_id = ?",
+                        "apollo_item_in_collection.item_id = ?",
                         hades::row<styx::int_type>(i.copy_int<attr::item_id>())
                     ),
                     conn

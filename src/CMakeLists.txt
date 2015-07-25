@@ -6,7 +6,7 @@ target_link_libraries(
     atlas-com-http-server
     atlas-web
     hades
-    ${CMAKE_CURRENT_BINARY_DIR}/../static/static.a
+    ${CMAKE_CURRENT_BINARY_DIR}/../web/static.a
     ${ImageMagick_LIBRARIES}
     "exiv2"
     ${CMAKE_THREAD_LIBS_INIT}

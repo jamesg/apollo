@@ -211,18 +211,6 @@ var ManageHomePage = PageView.extend(
         pageTitle: 'Manage Collection',
         render: function() {},
         template: _.template($('#manage-homepage').html()),
-        events: {
-            'click button[name=show-options]': 'showOptions'
-        },
-        showOptions: function() {
-            gApplication.modal(
-                new Modal({
-                    buttons: [ StandardButton.save(), StandardButton.cancel() ],
-                    view: OptionsForm,
-                    model: gApplication.options()
-                })
-                );
-        },
         initialize: function(options) {
             PageView.prototype.initialize.apply(this, arguments);
             PageView.prototype.render.apply(this);
@@ -260,6 +248,7 @@ var ManageHomePage = PageView.extend(
                     events: {
                         'change input': function() {
                             makersView.render();
+                            typesView.render();
                         }
                     }
                 })
@@ -329,7 +318,17 @@ var ManageHomePage = PageView.extend(
             this._makers.fetch();
             this._types.fetch();
         },
+        showOptions: function() {
+            gApplication.modal(
+                new Modal({
+                    buttons: [ StandardButton.save(), StandardButton.cancel() ],
+                    view: OptionsForm,
+                    model: gApplication.options()
+                })
+                );
+        },
         events: {
+            'click button[name=show-options]': 'showOptions',
             'click button[name=new-collection]': 'newCollection',
             'click button[name=new-maker]': 'newMaker',
             'click button[name=new-type]': 'newType'
