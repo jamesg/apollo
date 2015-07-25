@@ -21,7 +21,7 @@ add_definitions("-std=c++11")
 add_subdirectory(src)
 
 # Web components
-add_subdirectory(static)
+add_subdirectory(web)
 
 add_executable(apollo src/main/apollo.cpp)
 add_dependencies(apollo-server-lib apollo-static)
@@ -29,4 +29,3 @@ target_link_libraries(
     apollo
     apollo-server-lib
     )
-
