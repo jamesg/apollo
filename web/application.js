@@ -106,50 +106,6 @@ var TableView = StaticView.extend(
     //}
     //);
 
-var CheckedCollectionView = CollectionView.extend(
-        {
-            // Get a list of models which are checked.
-            checked: function() {
-                var out = [];
-                this.each(
-                    function(view) {
-                        if(view.$('input[type=checkbox]').prop('checked'))
-                            out.push(view.model);
-                    }
-                );
-                return out;
-            },
-            // Get a list of model ids which are checked.
-            checkedIds: function() {
-                return _.pluck(this.checked(), 'id');
-            },
-            // Set the list of checked models using a Backbone collection.
-            setChecked: function(collection) {
-                this.each(
-                    function(view) {
-                        view.$('input[type=checkbox]').prop(
-                            'checked',
-                            collection.some(
-                                function(model) { return model.id == view.model.id }
-                            )
-                        );
-                    }
-                );
-            },
-            // Set the list of checked models using an array of ids.
-            setCheckedIds: function(ids) {
-                this.each(
-                    function(view) {
-                        this.view.$('input[type=checkbox]').prop(
-                            'checked',
-                            _.some(ids, function(id) { return id == view.model.id })
-                        );
-                    }
-                );
-            }
-        }
-    );
-
 var Application = function(homeView) {
     StackedApplication.apply(this, arguments);
     this._options = new Options;
