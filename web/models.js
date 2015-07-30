@@ -58,9 +58,15 @@ var Item = RestModel.extend(
             maker_name: '',
             item_name: '',
             item_notes: '',
-            item_year: 1970,
+            item_year: null,
             item_cond: 0,
             item_cond_notes: ''
+        },
+        parse: function(json) {
+            var result = RestModel.prototype.parse(json);
+            if(result['item_year'] == '')
+                result['item_year'] = null;
+            return result;
         },
         idAttribute: 'item_id',
         validate: function() {

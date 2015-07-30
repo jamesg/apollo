@@ -142,7 +142,6 @@ var ItemForm = StaticView.extend(
                     template: '<label><input type="checkbox"></input><%-collection_name%></label>',
                     events: {
                         'change input': function() {
-                            console.log('input change')
                             makersView.render();
                             typesView.render();
                         }
@@ -199,8 +198,6 @@ var ItemForm = StaticView.extend(
                 el: this.$('select[name=type_id]'),
                 model: this._types,
                 filter: (function(type) {
-                    console.log('filter type', type.attributes, collectionView.checkedIds(), (new CollectionCollection(type.get('collections')))
-                                .pluck('collection_id'))
                     // Maker is unknown or a related collection is checked.
                     return (type.id == 0) || type.get('collections').length == 0 ||
                         this.model.get('type_id') == type.id ||
@@ -233,7 +230,9 @@ var ItemForm = StaticView.extend(
                 maker_id: this.$('select[name=maker_id]').val(),
                 type_id: this.$('select[name=type_id]').val(),
                 item_notes: this.$('textarea[name=item_notes]').val(),
-                item_year: this.$('input[name=item_year]').val(),
+                item_year: this.$('input[name=year_known]').prop('checked') ?
+                    this.$('input[name=item_year]').val() :
+                    null,
                 item_cond: this.$('select[name=item_cond]').val(),
                 item_cond_notes: this.$('textarea[name=item_cond_notes]').val(),
                 collections: this._collectionView.checked()

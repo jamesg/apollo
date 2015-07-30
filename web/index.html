@@ -103,8 +103,14 @@
     </div>
     <div class="group">
         <label>
+            <input name="year_known" type="checkbox" <%if(item_year != null){%>checked<%}%>></input>
+            Year known
+        </label>
+    </div>
+    <div class="group">
+        <label>
             Release year
-            <input type="number" name="item_year" value="<%-item_year%>">
+            <input type="number" name="item_year" value="<%if(item_year == null){%>1970<%}else{%><%-item_year%><%}%>">
         </label>
     </div>
     <div class="group">
@@ -174,7 +180,7 @@
 <h3>Collections</h3>
 <ul name="collections"></ul>
 
-<emph>Year of Release</emph> <%-item_year%>
+<emph>Year of Release</emph> <%if(item_year == null){%>Unknown<%}else{%><%-item_year%><%}%>
 
 <h3>Notes</h3>
 <p>
