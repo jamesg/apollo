@@ -258,15 +258,15 @@ var ImageUploadForm = StaticView.extend(
     {
         initialize: function(options) {
             StaticView.prototype.initialize.apply(this, arguments);
+            StaticView.prototype.render.apply(this);
+            this._messageBox =
+                new MessageBox({ el: this.$('div[name=messagebox]') });
             this._uploadUrl = options.url;
             this.on('save', this.save.bind(this));
             this.render();
         },
-        template: _.template($('#imageupload-template').html()),
+        template: $('#imageupload-template').html(),
         render: function() {
-            this.$el.html(this.template(this.templateParams()));
-            this._messageBox =
-                new MessageBox({ el: this.$('div[name=messagebox]') });
         },
         save: function() {
             var modal = this;
@@ -287,7 +287,15 @@ var ImageUploadForm = StaticView.extend(
                     true
                     );
             xhr.onload = reqListener;
-            var formData = new FormData(this.el);
+            var formData = new FormData;
+            formData.append(
+                'attachment_title',
+                this.$('input[name=attachment_title]').val()
+            );
+            formData.append(
+                'attachment_data',
+                $('input[name=attachment_data]').get(0).files[0]
+            );
             this._messageBox.displayInformation('Uploading...');
             xhr.send(formData);
         }
