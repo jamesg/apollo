@@ -326,8 +326,8 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
             item i = styx::first(
                 hades::outer_join<item, maker>(
                     conn,
+                    "apollo_item.maker_id = apollo_maker.maker_id",
                     hades::where(
-                        "apollo_item.maker_id = apollo_maker.maker_id and "
                         "apollo_item.item_id = ?",
                         hades::row<styx::int_type>(item_id)
                     )
@@ -543,9 +543,9 @@ boost::shared_ptr<atlas::http::router> apollo::rest::router(
             return atlas::http::json_response(
                 hades::outer_join<item, maker>(
                     conn,
+                    "apollo_item.maker_id = apollo_maker.maker_id",
                     hades::filter(
                         hades::where(
-                            "apollo_item.maker_id = apollo_maker.maker_id and "
                             "apollo_item.maker_id = ?",
                             hades::row<styx::int_type>(maker_id)
                             ),
